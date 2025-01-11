@@ -1,2 +1,8 @@
 build/
 devel/
+*.log
+*.swp
+*.tmp
+*.bak
+*.pyc
+_pycache_/
