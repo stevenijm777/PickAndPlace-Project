@@ -121,6 +121,9 @@ class PickAndPlace(object):
             ik_step.orientation.z = d*ik_delta.orientation.z + pose.orientation.z
             ik_step.orientation.w = d*ik_delta.orientation.w + pose.orientation.w
             joint_angles = self._limb.ik_request(ik_step, self._tip_name)
+            if not joint_angles:
+                rospy.logerr("IK request failed, pose is not reachable.")
+                return
             if joint_angles:
                 self._limb.set_joint_positions(joint_angles)
             else:
