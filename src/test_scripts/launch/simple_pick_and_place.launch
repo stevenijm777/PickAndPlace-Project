@@ -1,0 +1,9 @@
+<launch>
+    <!-- Lanzar Gazebo con el mundo de Sawyer -->
+    <include file="$(find sawyer_gazebo)/launch/sawyer_world.launch"/>
+
+    <!-- Ejecutar el script de Pick and Place -->
+    <node name="simple_pick_and_place" pkg="test_scripts" type="test_arm.py" output="screen">
+        <param name="use_sim_time" value="true"/>
+    </node>
+</launch>
