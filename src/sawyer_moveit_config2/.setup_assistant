@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: sawyer_description
+    relative_path: urdf/sawyer.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/sawyer.srdf
+  CONFIG:
+    author_name: stemajra
+    author_email: stemajra@espol.edu.ec
+    generated_timestamp: 1736658408
