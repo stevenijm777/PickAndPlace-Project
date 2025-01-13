@@ -32,7 +32,7 @@ def load_gazebo_models():
     spawn_urdf = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
 
     # Poses de la mesa y las cajas
-    table_pose = Pose(position=Point(x=0.75, y=0.0, z=0.0))
+    table_pose = Pose(position=Point(x=1.0, y=0.0, z=0.0))
     block1_pose = Pose(position=Point(x=0.6, y=0.1, z=0.7725))
     block2_pose = Pose(position=Point(x=0.6, y=0.3, z=0.7725))
     block3_pose = Pose(position=Point(x=0.6, y=-0.1, z=0.7725))
