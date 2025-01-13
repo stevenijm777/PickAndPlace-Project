@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Right electric gripper param. Set to true to check for collisions for their links -->
-  <arg name="electric_gripper" default="false"/>
+  <arg name="electric_gripper" default="true"/>
   <!-- Set the kinematic tips for the left_arm and right_arm move_groups -->
   <arg name="tip_name" default="right_hand"/>
   <!-- Add controller box collision shape to check for link collisions if set to true-->
