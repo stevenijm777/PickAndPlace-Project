@@ -89,7 +89,7 @@ namespace my_planning
             move_group.setStartStateToCurrentState();
             move_group.setMaxVelocityScalingFactor(1.0);
         }
-        void MyPlanningClass::addTable()
+        void MyPlanningClass::makeTable()
         {
             moveit_msgs::CollisionObject table;
         
@@ -107,9 +107,9 @@ namespace my_planning
         
             // Definir la pose de la mesa
             geometry_msgs::Pose table_pose;
-            table_pose.position.x = 0.75; // Coordenada x
+            table_pose.position.x = 1.1; // Coordenada x
             table_pose.position.y = 0.0;  // Coordenada y
-            table_pose.position.z = 0.375; // Coordenada z (mitad de la altura)
+            table_pose.position.z = -0.75; // Coordenada z (mitad de la altura)
         
             // Agregar geometría y pose al objeto de colisión
             table.primitives.push_back(primitive);
@@ -119,9 +119,9 @@ namespace my_planning
             // Agregar el objeto de colisión al entorno de planificación
             std::vector<moveit_msgs::CollisionObject> collision_objects;
             collision_objects.push_back(table);
-            virtual_world.addCollisionObjects(collision_objects);
-        
-            ROS_INFO_STREAM("Mesa agregada como obstáculo en MoveIt!");
+            ros::Duration(2).sleep();
+            virtual_world.addCollisionObjects(collision_objects);       
+            ROS_INFO_STREAM("Added: cafe_table");
         }
          void MyPlanningClass::makeBox(std::string blk_name, double *pose)
          {
@@ -156,18 +156,24 @@ namespace my_planning
 
         void MyPlanningClass::addObjects()
         {
-            double box_pose1[3] = {0.60, -0.67, 0.0,};
-            makeBox("block_1", box_pose1);
+            //double box_pose1[3] = {0.60, -0.67, 0.0,};
+            //makeBox("block_1", box_pose1);
 
-            double box_pose2[3] = {0.0, 0.77, 0.0,};
-            makeBox("block_2", box_pose2);
+            //double box_pose2[3] = {0.0, 0.77, 0.0,};
+            //makeBox("block_2", box_pose2);
+            
+            // Add table
+            makeTable();
+
+
         }
 
         void MyPlanningClass::removeObjects()
         {
             std::vector<std::string> object_ids;
-            object_ids.push_back("block_1");
-            object_ids.push_back("block_2");
+            //object_ids.push_back("block_1");
+            //object_ids.push_back("block_2");
+            object_ids.push_back("cafe_table");
             virtual_world.removeCollisionObjects(object_ids);
         }
 }
