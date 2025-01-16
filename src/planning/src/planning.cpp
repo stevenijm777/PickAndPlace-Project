@@ -49,6 +49,29 @@ namespace my_planning
             move_group.move(); //blocking
         }
 
+        void MyPlanningClass::goToInitialState()
+        {
+            robot_state::RobotState current_state = *move_group.getCurrentState();
+            std::vector<double> joint_positions;
+            joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
+            current_state.copyJointGroupPositions(joint_model_group, joint_positions);
+
+            joint_positions[0] = -0.243;
+            joint_positions[1] = 1.266;
+            joint_positions[2] = -0.103;
+            joint_positions[3] = 0.198;
+            joint_positions[4] = -0.035;
+            joint_positions[5] = -0.175;
+            joint_positions[6] = 0.063;
+            
+            move_group.setJointValueTarget(joint_positions);
+            bool success = (move_group.plan(my_plan)==moveit::planning_interface::MoveItErrorCode::SUCCESS);
+            if (!success)
+                throw std::runtime_error("No plan found");
+            move_group.move(); // blocking
+
+        }
+
         void MyPlanningClass::cartesianPath()
         {
             std::vector<geometry_msgs::Pose> waypoints;
@@ -102,14 +125,14 @@ namespace my_planning
             primitive.type = primitive.BOX;
             primitive.dimensions.resize(3);
             primitive.dimensions[0] = 1.0; // Largo de la mesa
-            primitive.dimensions[1] = 0.5; // Ancho de la mesa
-            primitive.dimensions[2] = 0.75; // Altura de la mesa
+            primitive.dimensions[1] = 1; // Ancho de la mesa
+            primitive.dimensions[2] = 0.5; // Altura de la mesa
         
             // Definir la pose de la mesa
             geometry_msgs::Pose table_pose;
-            table_pose.position.x = 1.1; // Coordenada x
+            table_pose.position.x = 1.2; // Coordenada x
             table_pose.position.y = 0.0;  // Coordenada y
-            table_pose.position.z = -0.75; // Coordenada z (mitad de la altura)
+            table_pose.position.z = -0.335; // Coordenada z (mitad de la altura)
         
             // Agregar geometría y pose al objeto de colisión
             table.primitives.push_back(primitive);

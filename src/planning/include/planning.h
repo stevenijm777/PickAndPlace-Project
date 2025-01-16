@@ -29,6 +29,7 @@ namespace my_planning
             void resetValues();
             void addObjects();
             void makeTable();
+            void goToInitialState();
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
 
@@ -39,7 +40,6 @@ namespace my_planning
             moveit::planning_interface::PlanningSceneInterface virtual_world;
             const robot_state::JointModelGroup* joint_model_group;
             moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
             geometry_msgs::Pose target_pose1;
     };
 }

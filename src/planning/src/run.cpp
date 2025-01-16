@@ -27,7 +27,7 @@ int main(int argc, char **argv)
             my_planning_.goToPoseGoal();
             break;
         case 2:
-            my_planning_.goToJointState();
+            my_planning_.goToInitialState();
             break;
         case 3:
             my_planning_.cartesianPath();
