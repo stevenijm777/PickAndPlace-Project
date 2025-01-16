@@ -28,6 +28,7 @@ namespace my_planning
             void cartesianPath();
             void resetValues();
             void addObjects();
+            void addTable();
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
 

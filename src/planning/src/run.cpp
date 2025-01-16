@@ -12,17 +12,17 @@ int main(int argc, char **argv)
         ROS_INFO(" ");
         ROS_INFO("\tUsage:");
         ROS_INFO(" ");
-        ROS_INFO("\trosrun planning run  n");
+        ROS_INFO("\trosrun planning run <n>");
         return 1;
     }
 
     my_planning::MyPlanningClass my_planning_;
 
     int selection = atoi(argv[1]);
+    my_planning_.resetValues(); // Llamada fuera del switch para inicializar siempre
+
     switch(selection)
     {
-        my_planning_.resetValues();
-
         case 1:
             my_planning_.goToPoseGoal();
             break;
@@ -37,8 +37,11 @@ int main(int argc, char **argv)
             break;
         case 5:
             my_planning_.removeObjects();
+            break;
+        default:
+            ROS_WARN("Invalid option. Please select a valid number between 1 and 5.");
+            break;
     }
-
 
     spinner.stop();
     return 0;
