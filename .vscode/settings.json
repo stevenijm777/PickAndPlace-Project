@@ -1,3 +1,15 @@
 {
-    "cmake.sourceDirectory": "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_gazebo"
+    "cmake.sourceDirectory": "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_gazebo",
+    "files.associations": {
+        "*.sqlbook": "sql",
+        "*.ndjson": "jsonl",
+        "*.dbclient-js": "javascript",
+        "*.xacro": "xml",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
+    }
 }

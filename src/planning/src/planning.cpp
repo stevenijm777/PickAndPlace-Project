@@ -124,13 +124,13 @@ namespace my_planning
             shape_msgs::SolidPrimitive primitive;
             primitive.type = primitive.BOX;
             primitive.dimensions.resize(3);
-            primitive.dimensions[0] = 1.0; // Largo de la mesa
-            primitive.dimensions[1] = 1; // Ancho de la mesa
-            primitive.dimensions[2] = 0.5; // Altura de la mesa
+            primitive.dimensions[0] = 0.913; // Largo de la mesa
+            primitive.dimensions[1] = 0.913; // Ancho de la mesa
+            primitive.dimensions[2] = 0.720; // Altura de la mesa
         
             // Definir la pose de la mesa
             geometry_msgs::Pose table_pose;
-            table_pose.position.x = 1.2; // Coordenada x
+            table_pose.position.x = 1.0; // Coordenada x
             table_pose.position.y = 0.0;  // Coordenada y
             table_pose.position.z = -0.335; // Coordenada z (mitad de la altura)
         
@@ -156,9 +156,9 @@ namespace my_planning
             shape_msgs::SolidPrimitive primitive;
             primitive.type = primitive.BOX;
             primitive.dimensions.resize(3);
-            primitive.dimensions[0] = 0.2;
-            primitive.dimensions[1] = 0.2;
-            primitive.dimensions[2] = 1.0;
+            primitive.dimensions[0] = 0.045;
+            primitive.dimensions[1] = 0.045;
+            primitive.dimensions[2] = 0.045;
 
             geometry_msgs::Pose box_pose;
             box_pose.orientation.w = 1.0;
