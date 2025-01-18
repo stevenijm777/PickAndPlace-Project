@@ -167,6 +167,7 @@ namespace my_planning
         object_ids.push_back("cafe_table");
         virtual_world.removeCollisionObjects(object_ids);
     }
+    
     void MyPlanningClass::goToPosition(double x, double y, double z, double orientation)
     {
         std::vector<geometry_msgs::Pose> waypoints;
@@ -249,5 +250,5 @@ namespace my_planning
             ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
         }
     }
-    
+
 }
