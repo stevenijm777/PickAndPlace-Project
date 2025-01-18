@@ -33,6 +33,7 @@ namespace my_planning
             void goToInitialState();
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
+            void goToPosition(double x, double y, double z, double orientation);
 
         private:
             const std::string PLANNING_GROUP = "right_arm";

@@ -12,57 +12,28 @@ namespace my_planning
         move_group.move(); // blocking
     }
 
-    void MyPlanningClass::goToPoseGoal(geometry_msgs::Pose &pose)
-    {
-        move_group.setPoseTarget(pose);
-        ros::Duration(0.5).sleep();
-        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        /*while (!success) //keep trying until a plan is found
-        {
-
-            success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        }*/
-
-        if (!success) // execute
-            throw std::runtime_error("No plan found");
-
-        move_group.move(); // blocking
-    }
-
-    void MyPlanningClass::goToJointState()
-    {
-        robot_state::RobotState current_state = *move_group.getCurrentState();
-        // moveit::core::RobotStatePtr current_state = move_group.getCurrentState();
-        std::vector<double> joint_positions;
-        joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
-        current_state.copyJointGroupPositions(joint_model_group, joint_positions);
-        // joint_positions = move_group.getCurrentJointValues();
-
-        joint_positions[0] = -1.0;
-        joint_positions[3] = 0.7;
-
-        move_group.setJointValueTarget(joint_positions);
-        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        if (!success)
-            throw std::runtime_error("No plan found");
-
-        move_group.move(); // blocking
-    }
-
     void MyPlanningClass::goToInitialState()
     {
         robot_state::RobotState current_state = *move_group.getCurrentState();
         std::vector<double> joint_positions;
         joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
         current_state.copyJointGroupPositions(joint_model_group, joint_positions);
+// initial 
+//        joint_positions[0] = -0.243;
+//        joint_positions[1] = 1.266;
+//        joint_positions[2] = -0.103;
+//        joint_positions[3] = 0.198;
+//        joint_positions[4] = -0.035;
+//        joint_positions[5] = -0.175;
+//        joint_positions[6] = 0.063;
 
-        joint_positions[0] = -0.243;
-        joint_positions[1] = 1.266;
-        joint_positions[2] = -0.103;
-        joint_positions[3] = 0.198;
-        joint_positions[4] = -0.035;
-        joint_positions[5] = -0.175;
-        joint_positions[6] = 0.063;
+        joint_positions[0] = 0.577;
+        joint_positions[1] = -0.548;
+        joint_positions[2] = 1.596;
+        joint_positions[3] = 1.596;
+        joint_positions[4] = -2.317;
+        joint_positions[5] = -1.638;
+        joint_positions[6] = 1.191;
 
         move_group.setJointValueTarget(joint_positions);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -131,7 +102,7 @@ namespace my_planning
         geometry_msgs::Pose table_pose;
         table_pose.position.x = 1.0;  // Coordenada x
         table_pose.position.y = 0.0;  // Coordenada y
-        table_pose.position.z = -0.4; // Coordenada z (mitad de la altura)
+        table_pose.position.z = -0.6; // Coordenada z (mitad de la altura)
 
         // Agregar geometría y pose al objeto de colisión
         table.primitives.push_back(primitive);
@@ -196,7 +167,7 @@ namespace my_planning
         object_ids.push_back("cafe_table");
         virtual_world.removeCollisionObjects(object_ids);
     }
-    void MyPlanningClass::cartesianPath2()
+    void MyPlanningClass::goToPosition(double x, double y, double z, double orientation)
     {
         std::vector<geometry_msgs::Pose> waypoints;
 
@@ -206,9 +177,54 @@ namespace my_planning
 
         // Pose objetivo
         geometry_msgs::Pose target_pose;
-        target_pose.position.x = 0.5;
-        target_pose.position.y = 0.5;
-        target_pose.position.z = 0.5;
+        target_pose.position.x = x;
+        target_pose.position.y = y;
+        target_pose.position.z = z;
+
+        // Manten la orientacion inicial para este ejemplo
+        // target_pose.orientation = start_pose.orientation;
+
+        // Si "orientation" es un angulo en radianes alrededor de z: 
+        // tf2::Quaternion q; q.setRPY(roll, pitch, yaw)
+        // Aqui ponemos roll =0, pitch =0, yaw = orientation
+        tf2::Quaternion q;
+        q.setRPY(0.0, 0.0, orientation);
+       
+        // Conversion explicita de tf2::Quaternion a geometry::Quaternion
+        geometry_msgs::Quaternion quat_msg;
+        waypoints.push_back(target_pose);
+
+        // Configuracion de la interpolacion cartesiana
+        move_group.setMaxVelocityScalingFactor(0.1); // Escalado de velocidad
+        moveit_msgs::RobotTrajectory trajectory;
+        const double eef_step = 0.01; // Resolucion de interpolacion
+
+        // Generar trayectoria cartesiana
+        double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
+
+        if (fraction > 0.95)
+        { // Si mas del 95% de la trayectoria es alcanzable
+            ROS_INFO_STREAM("Trayectoria generada con exito. Fraccion alcanzada: " << fraction);
+            move_group.execute(trajectory); // Ejecutar la trayectoria generada
+        }
+        else
+        {
+            ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
+        }
+    }
+        void MyPlanningClass::cartesianPath2()
+    {
+        std::vector<geometry_msgs::Pose> waypoints;
+
+        // Pose inicial
+        geometry_msgs::Pose start_pose = move_group.getCurrentPose().pose; // Obten la posicion actual
+        waypoints.push_back(start_pose);
+
+        // Pose objetivo
+        geometry_msgs::Pose target_pose;
+        target_pose.position.x = 0.276;
+        target_pose.position.y = 0.175;
+        target_pose.position.z = -0.437;
 
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
@@ -233,4 +249,5 @@ namespace my_planning
             ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
         }
     }
+    
 }
