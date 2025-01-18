@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     switch (selection)
     {
         case 1:
-            my_planning_.goToCartesianState();
+            my_planning_.cartesianPath();
             break;
         case 2:
             my_planning_.goToJointArticulateState();
@@ -38,8 +38,8 @@ int main(int argc, char **argv)
                 double z = atof(argv[4]);
                 double orientation = atof(argv[5]);
 
-                ROS_INFO("Running cartesianPath with x=%.2f, y=%.2f, z=%.2f, orientation=%.2f", x, y, z, orientation);
-                my_planning_.goToPosition(x, y, z, orientation);
+                ROS_INFO("Running cartesianPath with x=%.2f, y=%.2f, z=%.2f", x, y, z);
+                my_planning_.goToPosition(x, y, z);
             }
             else
             {

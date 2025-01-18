@@ -29,17 +29,19 @@ void MyPlanningClass::goToPoseGoal()
         move_group.move(); // blocking
     }
 
-    void MyPlanningClass::goToJointState()
+    void MyPlanningClass::goToJointState(double q1, double q2, double q3, double q4, double q5, double q6)
     {
         robot_state::RobotState current_state = *move_group.getCurrentState();
-        // moveit::core::RobotStatePtr current_state = move_group.getCurrentState();
         std::vector<double> joint_positions;
         joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
         current_state.copyJointGroupPositions(joint_model_group, joint_positions);
-        // joint_positions = move_group.getCurrentJointValues();
 
-        joint_positions[0] = -1.0;
-        joint_positions[3] = 0.7;
+        joint_positions[0] = q1;
+        joint_positions[1] = q2;
+        joint_positions[2] = q3;
+        joint_positions[3] = q4;
+        joint_positions[4] = q5;
+        joint_positions[5] = q6;
 
         move_group.setJointValueTarget(joint_positions);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -63,14 +65,12 @@ void MyPlanningClass::goToPoseGoal()
 //        joint_positions[4] = -0.035;
 //        joint_positions[5] = -0.175;
 //        joint_positions[6] = 0.063;
-
-        joint_positions[0] = 0.577;
-        joint_positions[1] = -0.548;
-        joint_positions[2] = 1.596;
-        joint_positions[3] = 1.596;
-        joint_positions[4] = -2.317;
-        joint_positions[5] = -1.638;
-        joint_positions[6] = 1.191;
+        joint_positions[0] = -0.328;
+        joint_positions[1] = 0.254;
+        joint_positions[2] = -2.925;
+        joint_positions[3] = 0.016;
+        joint_positions[4] = 2.854;
+        joint_positions[5] = 1.270;
 
         move_group.setJointValueTarget(joint_positions);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -85,17 +85,18 @@ void MyPlanningClass::goToPoseGoal()
         waypoints.push_back(target_pose1);
 
         geometry_msgs::Pose target_pose2 = target_pose1;
-
-        target_pose2.position.z -= 0.2;
+        target_pose2.position.x = 0.5;
+        target_pose2.position.y = -0.5;
+        target_pose2.position.z = 0.6;
         waypoints.push_back(target_pose2);
 
-        target_pose2.position.y -= 0.2;
+        target_pose2.position.z += 0.5;
         waypoints.push_back(target_pose2);
 
-        target_pose2.position.z += 0.2;
-        target_pose2.position.y += 0.2;
-        target_pose2.position.x -= 0.2;
+        target_pose2.position.y += 1.0;
         waypoints.push_back(target_pose2);
+
+        target_pose2.position.z -=0.5;
 
         move_group.setMaxVelocityScalingFactor(0.1);
 
@@ -119,6 +120,7 @@ void MyPlanningClass::goToPoseGoal()
         move_group.setStartStateToCurrentState();
         move_group.setMaxVelocityScalingFactor(1.0);
     }
+
     void MyPlanningClass::makeTable()
     {
         moveit_msgs::CollisionObject table;
@@ -153,6 +155,7 @@ void MyPlanningClass::goToPoseGoal()
         virtual_world.addCollisionObjects(collision_objects);
         ROS_INFO_STREAM("Added: cafe_table");
     }
+
     void MyPlanningClass::makeBox(std::string blk_name, double *pose)
     {
         moveit_msgs::CollisionObject box;
@@ -205,7 +208,7 @@ void MyPlanningClass::goToPoseGoal()
         virtual_world.removeCollisionObjects(object_ids);
     }
 
-    void MyPlanningClass::goToPosition(double x, double y, double z, double orientation)
+    void MyPlanningClass::goToPosition(double x, double y, double z)
     {
         std::vector<geometry_msgs::Pose> waypoints;
 
@@ -222,14 +225,6 @@ void MyPlanningClass::goToPoseGoal()
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
 
-        // Si "orientation" es un angulo en radianes alrededor de z: 
-        // tf2::Quaternion q; q.setRPY(roll, pitch, yaw)
-        // Aqui ponemos roll =0, pitch =0, yaw = orientation
-        tf2::Quaternion q;
-        q.setRPY(0.0, 0.0, orientation);
-       
-        // Conversion explicita de tf2::Quaternion a geometry::Quaternion
-        geometry_msgs::Quaternion quat_msg;
         waypoints.push_back(target_pose);
 
         // Configuracion de la interpolacion cartesiana
@@ -261,9 +256,9 @@ void MyPlanningClass::goToPoseGoal()
 
         // Pose objetivo
         geometry_msgs::Pose target_pose;
-        target_pose.position.x = 0.6;
-        target_pose.position.y = 0.1;
-        target_pose.position.z = 0.7725;
+        target_pose.position.x = 0.329;
+        target_pose.position.y = 0.389;
+        target_pose.position.z = 0.289;
 
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
@@ -287,15 +282,10 @@ void MyPlanningClass::goToPoseGoal()
         {
             ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
         }
-    }
+}
 
 void MyPlanningClass::goToJointArticulateState()
 {
-    robot_state::RobotState current_state = *move_group.getCurrentState();
-    std::vector<double> joint_positions;
-    joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
-    current_state.copyJointGroupPositions(joint_model_group, joint_positions);
-
     // Configuraciones articulares: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
     std::vector<std::vector<double>> joint_positions_list = {
         {-1.075, 0.348, -1.833, -0.048, 1.782, 1.270, 2.329}, // Izquierda bajo
@@ -305,66 +295,54 @@ void MyPlanningClass::goToJointArticulateState()
     };
 
     for (const auto& target_joint_positions : joint_positions_list) {
-        move_group.setJointValueTarget(target_joint_positions);
-        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        if (!success)
-            throw std::runtime_error("No se encontró un plan para la posición articular especificada.");
-
-        move_group.move(); // Bloquea hasta que el movimiento termine
+        goToJointState(
+            target_joint_positions[0],
+            target_joint_positions[1],
+            target_joint_positions[2],
+            target_joint_positions[3],
+            target_joint_positions[4],
+            target_joint_positions[5]
+        );
         ros::Duration(2.0).sleep();
     }
 }
 
-void MyPlanningClass::goToCartesianState()
-{
-    // Configuraciones cartesianas: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
-    std::vector<geometry_msgs::Pose> cartesian_positions = {
-        [] {
-            // abajo izquierda
-            geometry_msgs::Pose pose;
-            pose.position.x = 0.5;
-            pose.position.y = -0.5;
-            pose.position.z = 0.5;
-            pose.orientation.w = 1.0; // Orientación fija
-            return pose;
-        }(),
-        [] {
-            //arriba izquierda
-            geometry_msgs::Pose pose;
-            pose.position.x = 0.5;
-            pose.position.y = -0.5;
-            pose.position.z = 1.0;
-            pose.orientation.w = 1.0; // Orientación fija
-            return pose;
-        }(),
-        [] {
-            //arriba derecha
-            geometry_msgs::Pose pose;
-            pose.position.x = 0.5;
-            pose.position.y = 0.5;
-            pose.position.z = 1.0;
-            pose.orientation.w = 1.0; // Orientación fija
-            return pose;
-        }(),
-        [] {
-            // bajo derecha
-            geometry_msgs::Pose pose;
-            pose.position.x = 0.5;
-            pose.position.y = 0.5;
-            pose.position.z = 0.5;
-            pose.orientation.w = 1.0; // Orientación fija
-            return pose;
-        }()
-    };
+void MyPlanningClass::goRightPosition(double x, double y, double z){
+        std::vector<geometry_msgs::Pose> waypoints;
 
-    for (const auto& target_pose : cartesian_positions) {
-        move_group.setPoseTarget(target_pose);
-        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-        if (!success)
-            throw std::runtime_error("No se encontró un plan para la posición cartesiana especificada.");
+        // Pose inicial
+        geometry_msgs::Pose start_pose = move_group.getCurrentPose().pose; // Obten la posicion actual
+        waypoints.push_back(start_pose);
 
-        move_group.move(); // Bloquea hasta que el movimiento termine
-    }
+        // Pose objetivo
+        geometry_msgs::Pose target_pose;
+        target_pose.position.x = x;
+        target_pose.position.y = y;
+        target_pose.position.z = z;
+
+        // Manten la orientacion inicial para este ejemplo
+        target_pose.orientation = start_pose.orientation;
+
+        waypoints.push_back(target_pose);
+
+        // Configuracion de la interpolacion cartesiana
+        move_group.setMaxVelocityScalingFactor(0.1); // Escalado de velocidad
+        moveit_msgs::RobotTrajectory trajectory;
+        const double eef_step = 0.01; // Resolucion de interpolacion
+
+        // Generar trayectoria cartesiana
+        double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
+
+        if (fraction > 0.95)
+        { // Si mas del 95% de la trayectoria es alcanzable
+            ROS_INFO_STREAM("Trayectoria generada con exito. Fraccion alcanzada: " << fraction);
+            move_group.execute(trajectory); // Ejecutar la trayectoria generada
+        }
+        else
+        {
+            ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
+        }
 }
+
 
 }

@@ -21,7 +21,7 @@ namespace my_planning
                 move_group.allowReplanning(true);
                 move_group.setNumPlanningAttempts(10);
             }
-            void goToJointState();
+            void goToJointState(double q1, double q2, double q3, double q4, double q5, double q6);
             void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToPoseGoal();
             void cartesianPath();
@@ -32,9 +32,9 @@ namespace my_planning
             void goToInitialState();
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
-            void goToPosition(double x, double y, double z, double orientation);
+            void goToPosition(double x, double y, double z);
             void goToJointArticulateState();
-            void goToCartesianState();
+            void goRightPosition(double x, double y, double z);
 
 
         private:
