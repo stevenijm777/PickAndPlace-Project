@@ -100,7 +100,7 @@ namespace my_planning
             moveit_msgs::RobotTrajectory trajectory;
             const double jump_threshold = 0.0;
             const double eef_step = 0.01;
-            double fraction = move_group.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+            double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
 
             move_group.move();
             ROS_INFO_STREAM("Percentage of path followed: " << fraction);
@@ -132,7 +132,7 @@ namespace my_planning
             geometry_msgs::Pose table_pose;
             table_pose.position.x = 1.0; // Coordenada x
             table_pose.position.y = 0.0;  // Coordenada y
-            table_pose.position.z = -0.335; // Coordenada z (mitad de la altura)
+            table_pose.position.z = -0.4; // Coordenada z (mitad de la altura)
         
             // Agregar geometría y pose al objeto de colisión
             table.primitives.push_back(primitive);
@@ -199,4 +199,38 @@ namespace my_planning
             object_ids.push_back("cafe_table");
             virtual_world.removeCollisionObjects(object_ids);
         }
+        void MyPlanningClass::cartesianPath2()
+        {
+            std::vector<geometry_msgs::Pose> waypoints;
+
+            // Pose inicial
+            geometry_msgs::Pose start_pose = move_group.getCurrentPose().pose; // Obten la posicion actual
+            waypoints.push_back(start_pose);
+            
+            // Pose objetivo
+            geometry_msgs::Pose target_pose;
+            target_pose.position.x = 0.5;
+            target_pose.position.y = 0.5;
+            target_pose.position.z = 0.5;
+
+            // Manten la orientacion inicial para este ejemplo
+            //target_pose.orientation = start_pose.orientation;
+
+            waypoints.push_back(target_pose);
+
+            // Configuracion de la interpolacion cartesiana
+            move_group.setMaxVelocityScalingFactor(0.1); // Escalado de velocidad
+            moveit_msgs::RobotTrajectory trajectory;
+            const double eef_step = 0.01; // Resolucion de interpolacion
+
+            // Generar trayectoria cartesiana
+            double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
+
+            if(fraction > 0.95) { // Si mas del 95% de la trayectoria es alcanzable
+                ROS_INFO_STREAM("Trayectoria generada con exito. Fraccion alcanzada: " << fraction);
+                move_group.execute(trajectory); // Ejecutar la trayectoria generada
+            } else {
+                ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
+            }
+            }   
 }

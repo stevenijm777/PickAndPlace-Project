@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     switch(selection)
     {
         case 1:
-            my_planning_.goToPoseGoal();
+            my_planning_.cartesianPath2();
             break;
         case 2:
             my_planning_.goToInitialState();

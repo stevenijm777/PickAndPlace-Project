@@ -26,6 +26,7 @@ namespace my_planning
             void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToJointState();
             void cartesianPath();
+            void cartesianPath2();
             void resetValues();
             void addObjects();
             void makeTable();
