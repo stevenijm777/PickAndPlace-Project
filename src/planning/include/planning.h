@@ -21,10 +21,9 @@ namespace my_planning
                 move_group.allowReplanning(true);
                 move_group.setNumPlanningAttempts(10);
             }
-
-            void goToPoseGoal();
-            void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToJointState();
+            void goToPoseGoal(geometry_msgs::Pose &pose);
+            void goToPoseGoal();
             void cartesianPath();
             void cartesianPath2();
             void resetValues();
@@ -34,6 +33,9 @@ namespace my_planning
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
             void goToPosition(double x, double y, double z, double orientation);
+            void goToJointArticulateState();
+            void goToCartesianState();
+
 
         private:
             const std::string PLANNING_GROUP = "right_arm";

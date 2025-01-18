@@ -25,10 +25,10 @@ int main(int argc, char **argv)
     switch (selection)
     {
         case 1:
-            my_planning_.cartesianPath();
+            my_planning_.goToCartesianState();
             break;
         case 2:
-            my_planning_.goToInitialState();
+            my_planning_.goToJointArticulateState();
             break;
         case 3:
             if (argc == 6) // Asegúrate de que haya 5 argumentos para x, y, z y orientación
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
             }
             break;
         case 4:
-            my_planning_.addObjects();
+            my_planning_.goToInitialState();
             break;
         case 5:
             my_planning_.cartesianPath2();

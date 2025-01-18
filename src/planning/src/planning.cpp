@@ -2,11 +2,48 @@
 
 namespace my_planning
 {
-    void MyPlanningClass::goToPoseGoal()
+void MyPlanningClass::goToPoseGoal()
     {
         move_group.setPoseTarget(target_pose1);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
         if (!success) // execute
+            throw std::runtime_error("No plan found");
+
+        move_group.move(); // blocking
+    }
+
+    void MyPlanningClass::goToPoseGoal(geometry_msgs::Pose &pose)
+    {
+        move_group.setPoseTarget(pose);
+        ros::Duration(0.5).sleep();
+        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        /*while (!success) //keep trying until a plan is found
+        {
+
+            success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        }*/
+
+        if (!success) // execute
+            throw std::runtime_error("No plan found");
+
+        move_group.move(); // blocking
+    }
+
+    void MyPlanningClass::goToJointState()
+    {
+        robot_state::RobotState current_state = *move_group.getCurrentState();
+        // moveit::core::RobotStatePtr current_state = move_group.getCurrentState();
+        std::vector<double> joint_positions;
+        joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
+        current_state.copyJointGroupPositions(joint_model_group, joint_positions);
+        // joint_positions = move_group.getCurrentJointValues();
+
+        joint_positions[0] = -1.0;
+        joint_positions[3] = 0.7;
+
+        move_group.setJointValueTarget(joint_positions);
+        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        if (!success)
             throw std::runtime_error("No plan found");
 
         move_group.move(); // blocking
@@ -167,7 +204,7 @@ namespace my_planning
         object_ids.push_back("cafe_table");
         virtual_world.removeCollisionObjects(object_ids);
     }
-    
+
     void MyPlanningClass::goToPosition(double x, double y, double z, double orientation)
     {
         std::vector<geometry_msgs::Pose> waypoints;
@@ -213,6 +250,7 @@ namespace my_planning
             ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
         }
     }
+
         void MyPlanningClass::cartesianPath2()
     {
         std::vector<geometry_msgs::Pose> waypoints;
@@ -223,9 +261,9 @@ namespace my_planning
 
         // Pose objetivo
         geometry_msgs::Pose target_pose;
-        target_pose.position.x = 0.276;
-        target_pose.position.y = 0.175;
-        target_pose.position.z = -0.437;
+        target_pose.position.x = 0.6;
+        target_pose.position.y = 0.1;
+        target_pose.position.z = 0.7725;
 
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
@@ -250,5 +288,83 @@ namespace my_planning
             ROS_WARN_STREAM("Trayectoria incompleta. Fraccion alcanzada:" << fraction);
         }
     }
+
+void MyPlanningClass::goToJointArticulateState()
+{
+    robot_state::RobotState current_state = *move_group.getCurrentState();
+    std::vector<double> joint_positions;
+    joint_model_group = current_state.getJointModelGroup(PLANNING_GROUP);
+    current_state.copyJointGroupPositions(joint_model_group, joint_positions);
+
+    // Configuraciones articulares: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
+    std::vector<std::vector<double>> joint_positions_list = {
+        {-1.075, 0.348, -1.833, -0.048, 1.782, 1.270, 2.329}, // Izquierda bajo
+        {-1.057, 0.152, -1.831, -0.049, 1.800, 1.457, 3.140}, // Izquierda arriba
+        {0.413, 0.097, 0.879, 0.703, 1.092, 1.128, 3.140},    // Derecha arriba
+        {-0.063, -0.036, 0.930, 0.611, -0.963, 1.307, -2.509} // Derecha abajo
+    };
+
+    for (const auto& target_joint_positions : joint_positions_list) {
+        move_group.setJointValueTarget(target_joint_positions);
+        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        if (!success)
+            throw std::runtime_error("No se encontró un plan para la posición articular especificada.");
+
+        move_group.move(); // Bloquea hasta que el movimiento termine
+        ros::Duration(2.0).sleep();
+    }
+}
+
+void MyPlanningClass::goToCartesianState()
+{
+    // Configuraciones cartesianas: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
+    std::vector<geometry_msgs::Pose> cartesian_positions = {
+        [] {
+            // abajo izquierda
+            geometry_msgs::Pose pose;
+            pose.position.x = 0.5;
+            pose.position.y = -0.5;
+            pose.position.z = 0.5;
+            pose.orientation.w = 1.0; // Orientación fija
+            return pose;
+        }(),
+        [] {
+            //arriba izquierda
+            geometry_msgs::Pose pose;
+            pose.position.x = 0.5;
+            pose.position.y = -0.5;
+            pose.position.z = 1.0;
+            pose.orientation.w = 1.0; // Orientación fija
+            return pose;
+        }(),
+        [] {
+            //arriba derecha
+            geometry_msgs::Pose pose;
+            pose.position.x = 0.5;
+            pose.position.y = 0.5;
+            pose.position.z = 1.0;
+            pose.orientation.w = 1.0; // Orientación fija
+            return pose;
+        }(),
+        [] {
+            // bajo derecha
+            geometry_msgs::Pose pose;
+            pose.position.x = 0.5;
+            pose.position.y = 0.5;
+            pose.position.z = 0.5;
+            pose.orientation.w = 1.0; // Orientación fija
+            return pose;
+        }()
+    };
+
+    for (const auto& target_pose : cartesian_positions) {
+        move_group.setPoseTarget(target_pose);
+        bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        if (!success)
+            throw std::runtime_error("No se encontró un plan para la posición cartesiana especificada.");
+
+        move_group.move(); // Bloquea hasta que el movimiento termine
+    }
+}
 
 }
