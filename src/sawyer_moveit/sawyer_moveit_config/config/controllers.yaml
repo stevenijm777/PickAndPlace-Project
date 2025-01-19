@@ -1,13 +1,21 @@
 controller_list:
   - name: /robot/limb/right
-  action_ns: follow_joint_trajectory
-  type: FollowJointTrajectory
-  default: true
-  joints:
-    - right_j0
-    - right_j1
-    - right_j2
-    - right_j3
-    - right_j4
-    - right_j5
-    - right_j6
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - right_j0
+      - right_j1
+      - right_j2
+      - right_j3
+      - right_j4
+      - right_j5
+      - right_j6
+
+  - name: /robot/end_effector/right_gripper
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: false
+    joints:
+      - right_gripper_l_finger_joint
+      - right_gripper_r_finger_joint

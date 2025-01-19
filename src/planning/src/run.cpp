@@ -13,7 +13,7 @@ int main(int argc, char **argv)
         ROS_INFO(" ");
         ROS_INFO("\tUsage:");
         ROS_INFO(" ");
-        ROS_INFO("\trosrun planning run <n> [x y z orientation]");
+        ROS_INFO("\trosrun planning run <n> [x y z]");
         return 1;
     }
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     switch (selection)
     {
         case 1:
-            my_planning_.cartesianPath();
+            my_planning_.PickAndPlace();
             break;
         case 2:
             my_planning_.goToJointArticulateState();
@@ -36,7 +36,6 @@ int main(int argc, char **argv)
                 double x = atof(argv[2]);
                 double y = atof(argv[3]);
                 double z = atof(argv[4]);
-                double orientation = atof(argv[5]);
 
                 ROS_INFO("Running cartesianPath with x=%.2f, y=%.2f, z=%.2f", x, y, z);
                 my_planning_.goToPosition(x, y, z);
@@ -47,7 +46,7 @@ int main(int argc, char **argv)
             }
             break;
         case 4:
-            my_planning_.goToInitialState();
+            my_planning_.addObjects();
             break;
         case 5:
             my_planning_.cartesianPath2();

@@ -1,4 +1,5 @@
 #include <planning.h>
+#include <moveit/move_group_interface/move_group_interface.h>
 
 namespace my_planning
 {
@@ -256,9 +257,9 @@ void MyPlanningClass::goToPoseGoal()
 
         // Pose objetivo
         geometry_msgs::Pose target_pose;
-        target_pose.position.x = 0.329;
-        target_pose.position.y = 0.389;
-        target_pose.position.z = 0.289;
+        target_pose.position.x = 1.0;
+        target_pose.position.y = 0.5;
+        target_pose.position.z = 1.0;
 
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
@@ -288,10 +289,8 @@ void MyPlanningClass::goToJointArticulateState()
 {
     // Configuraciones articulares: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
     std::vector<std::vector<double>> joint_positions_list = {
-        {-1.075, 0.348, -1.833, -0.048, 1.782, 1.270, 2.329}, // Izquierda bajo
+        {0, 0, 0, 0, 0, 0, 0 },
         {-1.057, 0.152, -1.831, -0.049, 1.800, 1.457, 3.140}, // Izquierda arriba
-        {0.413, 0.097, 0.879, 0.703, 1.092, 1.128, 3.140},    // Derecha arriba
-        {-0.063, -0.036, 0.930, 0.611, -0.963, 1.307, -2.509} // Derecha abajo
     };
 
     for (const auto& target_joint_positions : joint_positions_list) {
@@ -344,5 +343,37 @@ void MyPlanningClass::goRightPosition(double x, double y, double z){
         }
 }
 
+void MyPlanningClass::controlGripper()
+{
+    // Inicializa el grupo de la pinza
+    moveit::planning_interface::MoveGroupInterface gripper_group("right_gripper");
+
+    // Configura el objetivo de posición de la pinza
+    std::map<std::string, double> target_positions;
+    target_positions["right_gripper_l_finger_joint"] = 1.03; // Abierto
+    target_positions["right_gripper_r_finger_joint"] = 0.03; // Abierto
+    gripper_group.setJointValueTarget(target_positions);
+
+    // Planifica y ejecuta
+    moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
+    bool success = (gripper_group.plan(gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+    if (success)
+    {
+        gripper_group.move();
+    }
+    else
+    {
+        ROS_ERROR("No se pudo planificar el movimiento de la pinza.");
+    }    
+}
+
+void MyPlanningClass::PickAndPlace()
+{
+    goToPosition(1, 0.5, 0.5);
+    goRightPosition(1, 0.5, 1.0);
+    goRightPosition(1, -0.5, 1.0);
+    goRightPosition(1, -0.5, 0.5);
+}
 
 }

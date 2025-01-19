@@ -31,6 +31,9 @@
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>
   </include>
 
+  <!-- Cargar configuraciones de los controladores -->
+  <rosparam command="load" file="$(find sawyer_moveit_config)/config/controllers.yaml" />
+
   <!-- Sensors Functionality -->
   <arg name="kinect" default="false" />
   <arg name="xtion" default="false" />

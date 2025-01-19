@@ -35,6 +35,8 @@ namespace my_planning
             void goToPosition(double x, double y, double z);
             void goToJointArticulateState();
             void goRightPosition(double x, double y, double z);
+            void controlGripper();
+            void PickAndPlace();
 
 
         private:
