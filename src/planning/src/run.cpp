@@ -25,31 +25,19 @@ int main(int argc, char **argv)
     switch (selection)
     {
         case 1:
-            my_planning_.PickAndPlace();
+            my_planning_.OpenGripper();
             break;
         case 2:
-            my_planning_.goToJointArticulateState();
+            my_planning_.CloseGripper();
             break;
         case 3:
-            if (argc == 6) // Asegúrate de que haya 5 argumentos para x, y, z y orientación
-            {
-                double x = atof(argv[2]);
-                double y = atof(argv[3]);
-                double z = atof(argv[4]);
-
-                ROS_INFO("Running cartesianPath with x=%.2f, y=%.2f, z=%.2f", x, y, z);
-                my_planning_.goToPosition(x, y, z);
-            }
-            else
-            {
-                ROS_WARN("Invalid arguments. Usage for case 3: rosrun planning run 3 <x> <y> <z> <orientation>");
-            }
+            my_planning_.cartesianPath2();
             break;
         case 4:
-            my_planning_.addObjects();
+            my_planning_.goToJointArticulateState();
             break;
         case 5:
-            my_planning_.cartesianPath2();
+            my_planning_.goToInitialState();
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");

@@ -1,5 +1,7 @@
 #include <planning.h>
 #include <moveit/move_group_interface/move_group_interface.h>
+#include <std_msgs/Int32.h>
+#include <ros/ros.h>
 
 namespace my_planning
 {
@@ -66,12 +68,12 @@ void MyPlanningClass::goToPoseGoal()
 //        joint_positions[4] = -0.035;
 //        joint_positions[5] = -0.175;
 //        joint_positions[6] = 0.063;
-        joint_positions[0] = -0.328;
-        joint_positions[1] = 0.254;
-        joint_positions[2] = -2.925;
-        joint_positions[3] = 0.016;
-        joint_positions[4] = 2.854;
-        joint_positions[5] = 1.270;
+        joint_positions[0] = 0;
+        joint_positions[1] = 0;
+        joint_positions[2] = 0;
+        joint_positions[3] = 0;
+        joint_positions[4] = 0;
+        joint_positions[5] = 0;
 
         move_group.setJointValueTarget(joint_positions);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -167,9 +169,9 @@ void MyPlanningClass::goToPoseGoal()
         shape_msgs::SolidPrimitive primitive;
         primitive.type = primitive.BOX;
         primitive.dimensions.resize(3);
-        primitive.dimensions[0] = 0.045;
-        primitive.dimensions[1] = 0.045;
-        primitive.dimensions[2] = 0.045;
+        primitive.dimensions[0] = 0.5;
+        primitive.dimensions[1] = 0.3;
+        primitive.dimensions[2] = 0.2;
 
         geometry_msgs::Pose box_pose;
         box_pose.orientation.w = 1.0;
@@ -190,14 +192,17 @@ void MyPlanningClass::goToPoseGoal()
 
     void MyPlanningClass::addObjects()
     {
-        // double box_pose1[3] = {0.60, -0.67, 0.0,};
-        // makeBox("block_1", box_pose1);
+        double box_pose1[3] = {0.70, -0.25, -0.8};
+        makeBox("block_1", box_pose1);
 
-        // double box_pose2[3] = {0.0, 0.77, 0.0,};
-        // makeBox("block_2", box_pose2);
+        double box_pose2[3] = {0.7, 0.3, -0.8};
+        makeBox("block_2", box_pose2);
+
+        double box_pose3[3] = {1.3, 0.3, -0.8};
+        makeBox("block_3", box_pose2);
 
         // Add table
-        makeTable();
+        //makeTable();
     }
 
     void MyPlanningClass::removeObjects()
@@ -257,9 +262,9 @@ void MyPlanningClass::goToPoseGoal()
 
         // Pose objetivo
         geometry_msgs::Pose target_pose;
-        target_pose.position.x = 1.0;
-        target_pose.position.y = 0.5;
-        target_pose.position.z = 1.0;
+        target_pose.position.x = 1.09;
+        target_pose.position.y = 0.15;
+        target_pose.position.z = 0.32;
 
         // Manten la orientacion inicial para este ejemplo
         // target_pose.orientation = start_pose.orientation;
@@ -274,7 +279,7 @@ void MyPlanningClass::goToPoseGoal()
         // Generar trayectoria cartesiana
         double fraction = move_group.computeCartesianPath(waypoints, eef_step, trajectory);
 
-        if (fraction > 0.95)
+        if (fraction > 0.8)
         { // Si mas del 95% de la trayectoria es alcanzable
             ROS_INFO_STREAM("Trayectoria generada con exito. Fraccion alcanzada: " << fraction);
             move_group.execute(trajectory); // Ejecutar la trayectoria generada
@@ -355,6 +360,28 @@ void MyPlanningClass::controlGripper()
     msg.data = 0;
     gripper_pub.publish(msg);
     ros::Duration(2.0).sleep(); // 
+}
+
+void MyPlanningClass::OpenGripper()
+{
+    ros::NodeHandle nh;
+    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+    // Comando para abrir el gripper (1: abrir, 0: cerrar)
+    std_msgs::Int32 msg;
+    msg.data = 1;
+    gripper_pub.publish(msg);
+    ros::Duration(1.0).sleep();
+}
+
+void MyPlanningClass::CloseGripper()
+{
+    ros::NodeHandle nh;
+    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+    // Comando para abrir el gripper (1: abrir, 0: cerrar)
+    std_msgs::Int32 msg;
+    msg.data = 0;
+    gripper_pub.publish(msg);
+    ros::Duration(1.0).sleep();
 }
 
 void MyPlanningClass::PickAndPlace()

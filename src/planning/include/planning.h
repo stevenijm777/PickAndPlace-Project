@@ -37,6 +37,8 @@ namespace my_planning
             void goRightPosition(double x, double y, double z);
             void controlGripper();
             void PickAndPlace();
+            void OpenGripper();
+            void CloseGripper();
 
 
         private:
