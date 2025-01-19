@@ -345,27 +345,16 @@ void MyPlanningClass::goRightPosition(double x, double y, double z){
 
 void MyPlanningClass::controlGripper()
 {
-    // Inicializa el grupo de la pinza
-    moveit::planning_interface::MoveGroupInterface gripper_group("right_gripper");
-
-    // Configura el objetivo de posición de la pinza
-    std::map<std::string, double> target_positions;
-    target_positions["right_gripper_l_finger_joint"] = 1.03; // Abierto
-    target_positions["right_gripper_r_finger_joint"] = 0.03; // Abierto
-    gripper_group.setJointValueTarget(target_positions);
-
-    // Planifica y ejecuta
-    moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
-    bool success = (gripper_group.plan(gripper_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-    if (success)
-    {
-        gripper_group.move();
-    }
-    else
-    {
-        ROS_ERROR("No se pudo planificar el movimiento de la pinza.");
-    }    
+    ros::NodeHandle nh;
+    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+    // Comando para abrir el gripper (1: abrir, 0: cerrar)
+    std_msgs::Int32 msg;
+    msg.data = 1; // Cambia a 0 para cerrar el gripper
+    gripper_pub.publish(msg);
+    ros::Duration(2.0).sleep(); // 
+    msg.data = 0;
+    gripper_pub.publish(msg);
+    ros::Duration(2.0).sleep(); // 
 }
 
 void MyPlanningClass::PickAndPlace()
