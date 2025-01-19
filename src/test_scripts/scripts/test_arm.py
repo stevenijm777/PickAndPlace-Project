@@ -1,80 +1,103 @@
-#!/usr/bin/env python
-
-import argparse
-import struct
-import sys
-import copy
-
+#!/usr/bin/env python3
+import tf
 import rospy
 import rospkg
+from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState
+from geometry_msgs.msg import Pose, Point, Quaternion
 
-from gazebo_msgs.srv import (
-    SpawnModel,
-    DeleteModel,
-)
-from geometry_msgs.msg import (
-    PoseStamped,
-    Pose,
-    Point,
-    Quaternion,
-)
+class CubeSpawner():
+    def __init__(self) -> None:
+        self.rospack = rospkg.RosPack()
+        # Ruta a los bloques
+        self.path = "/home/coflores/ros/src/PickAndPlace-Project/src/sawyer_simulator/sawyer_sim_examples/models/block/"
+        # Ruta al modelo del bin
+        self.path_bin = "/home/coflores/ros/src/PickAndPlace-Project/src/sawyer_simulator/sawyer_sim_examples/models/bin.urdf"
 
-def load_gazebo_models():
-    """Carga la mesa y tres cajas en Gazebo"""
-    model_path = rospkg.RosPack().get_path('sawyer_sim_examples') + "/models/"
+        self.cubes = []
+        self.cubes.append(self.path + "red_cube.urdf")
+        self.cubes.append(self.path + "green_cube.urdf")
+        self.cubes.append(self.path + "blue_cube.urdf")
+        self.col = 0
 
-    # Cargar modelos de la mesa y las cajas
-    table_xml = open(model_path + "cafe_table/model.sdf", 'r').read()
-    block_xml = open(model_path + "block/model.urdf", 'r').read()
+        # Inicializar servicios de Gazebo
+        self.sm = rospy.ServiceProxy("/gazebo/spawn_urdf_model", SpawnModel)
+        self.dm = rospy.ServiceProxy("/gazebo/delete_model", DeleteModel)
+        self.ms = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
 
-    rospy.wait_for_service('/gazebo/spawn_sdf_model')
-    spawn_sdf = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    spawn_urdf = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
+        rospy.loginfo("CubeSpawner initialized.")
 
-    # Poses de la mesa y las cajas
-    table_pose = Pose(position=Point(x=0.75, y=0.0, z=0.0))
-    block1_pose = Pose(position=Point(x=0.6, y=0.1, z=0.7725))
-    block2_pose = Pose(position=Point(x=0.6, y=0.3, z=0.7725))
-    block3_pose = Pose(position=Point(x=0.6, y=-0.1, z=0.7725))
+    def spawn_bin(self):
+        """Carga los bins en Gazebo en forma de L."""
 
-    # Spawn de la mesa
-    try:
-        spawn_sdf("cafe_table", table_xml, "/", table_pose, "world")
-    except rospy.ServiceException as e:
-        rospy.logerr(f"Spawn SDF service call failed: {e}")
+        with open(self.path_bin, "r") as bin_file:
+            bin_urdf = bin_file.read()
 
-    # Spawn de las cajas
-    try:
-        spawn_urdf("block1", block_xml, "/", block1_pose, "world")
-        spawn_urdf("block2", block_xml, "/", block2_pose, "world")
-        spawn_urdf("block3", block_xml, "/", block3_pose, "world")
-    except rospy.ServiceException as e:
-        rospy.logerr(f"Spawn URDF service call failed: {e}")
+        # Tamaño de los bins
+        bin_width = 0.45  # Y dimension más amplia
+        bin_height = 0.4  # X dimension
 
-def delete_gazebo_models():
-    """Elimina los modelos de Gazebo"""
-    try:
-        delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-        delete_model("cafe_table")
-        delete_model("block1")
-        delete_model("block2")
-        delete_model("block3")
-    except rospy.ServiceException as e:
-        print(f"Delete Model service call failed: {e}")
+        # Posiciones para formar una "L"
+        bin_positions = [
+            Point(x=0.7, y=-0.25, z=0.09),  # Bin 1 (posición base)
+            Point(x=0.7, y=bin_width - 0.15, z=0.09),  # Bin 2 (al lado de Bin 1 en Y)
+            Point(x=0.7 + bin_height + 0.2, y=bin_width - 0.15, z=0.09)  # Bin 3 (perpendicular en X)
+        ]
 
-def main():
-    """Carga los modelos en Gazebo y espera que MoveIt los manipule"""
-    rospy.init_node("load_gazebo_models")
+        for i, pos in enumerate(bin_positions):
+            pose = Pose(pos, Quaternion(0, 0, 0, 1))  # Rotación en cero
+            self.sm(f"bin_{i+1}", bin_urdf, "", pose, "world")
+            rospy.loginfo(f"Bin {i+1} spawned at position {pos.x}, {pos.y}, {pos.z}")
 
-    # Cargar modelos en Gazebo
-    rospy.loginfo("Cargando modelos en Gazebo...")
-    load_gazebo_models()
+    def checkModel(self):
+        res = self.ms("cube", "world")
+        return res.success
 
-    # Elimina los modelos al cerrar
-    rospy.on_shutdown(delete_gazebo_models)
+    def getPosition(self):
+        res = self.ms("cube", "world")
+        return res.pose.position.z
 
-    rospy.loginfo("Modelos cargados. Usa MoveIt para planificar rutas.")
-    rospy.spin()
+    def spawnModel(self):
+        """Carga un cubo en Gazebo."""
+        cube = self.cubes[self.col]
+        with open(cube, "r") as f:
+            cube_urdf = f.read()
+
+        quat = tf.transformations.quaternion_from_euler(0, 0, 0)
+        orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
+        pose = Pose(Point(x=2, y=-1, z=0.75), orient)  # Ubicación del cubo
+        self.sm("cube", cube_urdf, "", pose, "world")
+
+        if self.col < 2:  # Cambiar al siguiente cubo
+            self.col += 1
+        else:
+            self.col = 0
+        rospy.sleep(1)
+
+    def deleteModel(self):
+        """Elimina el cubo actual de Gazebo."""
+        self.dm("cube")
+        rospy.sleep(1)
+
+    def shutdown_hook(self):
+        """Limpia modelos al apagar."""
+        self.deleteModel()
+        rospy.loginfo("Shutting down and cleaning up.")
 
 if __name__ == "__main__":
-    main()
+    print("Waiting for Gazebo services...")
+    rospy.init_node("spawn_objects")
+    rospy.wait_for_service("/gazebo/delete_model")
+    rospy.wait_for_service("/gazebo/spawn_urdf_model")
+    rospy.wait_for_service("/gazebo/get_model_state")
+    
+    r = rospy.Rate(15)
+    cs = CubeSpawner()
+    cs.spawn_bin()  # Cargar los bins en forma de L
+
+    rospy.on_shutdown(cs.shutdown_hook)
+    while not rospy.is_shutdown():
+        if cs.checkModel() == False:
+            cs.spawnModel()
+        elif cs.getPosition() < 0.05:
+            cs.deleteModel()
+        r.sleep()

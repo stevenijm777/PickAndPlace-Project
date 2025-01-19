@@ -67,6 +67,8 @@
   </include>
 
   <!-- Publish a static transform between the world and the base of the robot -->
+
+
   <node if="$(arg static)" pkg="tf2_ros" type="static_transform_publisher"
 	name="base_to_world" args="0 0 0 0 0 0 1 world base" />
 

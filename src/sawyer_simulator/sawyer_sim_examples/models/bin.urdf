@@ -1,0 +1,144 @@
+<?xml version='1.0'?>
+<robot name='bin'>
+
+  <link name="world"/>
+
+  <joint name="joint_fix" type="fixed">
+    <parent link="world"/>
+    <child link="bottom"/>
+  </joint>
+
+  <link name="bottom">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.3 0.02"/>  <!-- Base más pequeña -->
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.3 0.02"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.03" />
+      <inertia
+        ixx="0.0005" ixy="0.0"  ixz="0.0"
+        iyy="0.0005" iyz="0.0"
+        izz="0.0005" />
+    </inertial>
+  </link>
+
+  <joint name="left_wall" type="fixed">
+    <parent link="bottom"/>
+    <child link="left"/>
+  </joint>
+
+  <link name="left">
+    <collision>
+      <origin xyz="-0.25 0 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.3 0.16"/>  <!-- Pared más baja -->
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.25 0 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.3 0.16"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="right_wall" type="fixed">
+    <parent link="bottom"/>
+    <child link="right"/>
+  </joint>
+
+  <link name="right">
+    <collision>
+      <origin xyz="0.25 0 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.3 0.16"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.25 0 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.3 0.16"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="back_wall" type="fixed">
+    <parent link="bottom"/>
+    <child link="back"/>
+  </joint>
+
+  <link name="back">
+    <collision>
+      <origin xyz="0 0.15 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.02 0.16"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0.15 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.02 0.16"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="front_wall" type="fixed">
+    <parent link="bottom"/>
+    <child link="front"/>
+  </joint>
+
+  <link name="front">
+    <collision>
+      <origin xyz="0 -0.15 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.02 0.16"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 -0.15 0.08" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.5 0.02 0.16"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <gazebo reference="bottom">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="right">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="left">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="back">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="front">
+    <mu1>10</mu1>
+    <mu2>10</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+</robot>
