@@ -25,21 +25,20 @@ namespace my_planning
             void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToPoseGoal();
             void cartesianPath();
-            void cartesianPath2();
             void resetValues();
             void addObjects();
-            void makeTable();
             void goToInitialState();
             void makeBox(std::string blk_name, double *pose);
             void removeObjects();
             void goToPosition(double x, double y, double z);
-            void goToJointArticulateState();
+            void goToPick();
             void goRightPosition(double x, double y, double z);
             void controlGripper();
-            void PickAndPlace();
             void OpenGripper();
             void CloseGripper();
             void goToCaja1();
+            void goToCaja2();
+            void goToCaja3();
 
 
         private:

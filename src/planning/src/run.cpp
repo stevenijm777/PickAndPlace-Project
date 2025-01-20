@@ -25,19 +25,19 @@ int main(int argc, char **argv)
     switch (selection)
     {
         case 1:
-            my_planning_.OpenGripper();
-            break;
-        case 2:
-            my_planning_.CloseGripper();
-            break;
-        case 3:
             my_planning_.goToCaja1();
             break;
+        case 2:
+            my_planning_.goToCaja2();
+            break;
+        case 3:
+            my_planning_.goToCaja3();
+            break;
         case 4:
-            my_planning_.goToJointArticulateState();
+            my_planning_.goToPick();
             break;
         case 5:
-            my_planning_.addObjects();
+            my_planning_.cartesianPath();
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");
