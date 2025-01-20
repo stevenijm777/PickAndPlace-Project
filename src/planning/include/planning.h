@@ -39,6 +39,7 @@ namespace my_planning
             void PickAndPlace();
             void OpenGripper();
             void CloseGripper();
+            void goToCaja1();
 
 
         private:

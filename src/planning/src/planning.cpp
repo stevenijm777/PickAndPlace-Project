@@ -192,13 +192,13 @@ void MyPlanningClass::goToPoseGoal()
 
     void MyPlanningClass::addObjects()
     {
-        double box_pose1[3] = {0.70, -0.25, -0.8};
+        double box_pose1[3] = {-0.80, -0.25, -0.8};
         makeBox("block_1", box_pose1);
 
-        double box_pose2[3] = {0.7, 0.3, -0.8};
+        double box_pose2[3] = {-0.8, 0.1, -0.8};
         makeBox("block_2", box_pose2);
 
-        double box_pose3[3] = {1.3, 0.3, -0.8};
+        double box_pose3[3] = {1.19, 0.17, -0.8};
         makeBox("block_3", box_pose2);
 
         // Add table
@@ -295,7 +295,7 @@ void MyPlanningClass::goToJointArticulateState()
     // Configuraciones articulares: izquierda bajo -> izquierda arriba -> derecha arriba -> derecha abajo
     std::vector<std::vector<double>> joint_positions_list = {
         {0, 0, 0, 0, 0, 0, 0 },
-        {-1.057, 0.152, -1.831, -0.049, 1.800, 1.457, 3.140}, // Izquierda arriba
+        {-1.709, -0.333, 0.480, 0.744, -0.441, 0.843, 0.177}, // Izquierda arriba
     };
 
     for (const auto& target_joint_positions : joint_positions_list) {
@@ -307,9 +307,31 @@ void MyPlanningClass::goToJointArticulateState()
             target_joint_positions[4],
             target_joint_positions[5]
         );
-        ros::Duration(2.0).sleep();
+        ros::Duration(1.0).sleep();
+    
     }
 }
+
+void MyPlanningClass::goToCaja1(){
+    std::vector<std::vector<double>> joint_positions_list = {
+        {-3.049, -0.255, 0.092, -0.167, -0.190, 0.275, -0.024}, // caja 1
+        {-1.709, -0.333, 0.480, 0.744, -0.441, 0.843, 0.177}, // ready to pick
+    };
+
+    for (const auto& target_joint_positions : joint_positions_list) {
+        goToJointState(
+            target_joint_positions[0],
+            target_joint_positions[1],
+            target_joint_positions[2],
+            target_joint_positions[3],
+            target_joint_positions[4],
+            target_joint_positions[5]
+        );
+        ros::Duration(1.0).sleep();
+    
+    }
+}
+
 
 void MyPlanningClass::goRightPosition(double x, double y, double z){
         std::vector<geometry_msgs::Pose> waypoints;
@@ -370,6 +392,7 @@ void MyPlanningClass::OpenGripper()
     std_msgs::Int32 msg;
     msg.data = 1;
     gripper_pub.publish(msg);
+    ROS_INFO("Mensaje enviado: %d", msg.data);
     ros::Duration(1.0).sleep();
 }
 
@@ -381,6 +404,7 @@ void MyPlanningClass::CloseGripper()
     std_msgs::Int32 msg;
     msg.data = 0;
     gripper_pub.publish(msg);
+    ROS_INFO("Mensaje enviado: %d", msg.data);
     ros::Duration(1.0).sleep();
 }
 

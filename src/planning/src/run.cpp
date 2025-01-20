@@ -31,13 +31,13 @@ int main(int argc, char **argv)
             my_planning_.CloseGripper();
             break;
         case 3:
-            my_planning_.cartesianPath2();
+            my_planning_.goToCaja1();
             break;
         case 4:
             my_planning_.goToJointArticulateState();
             break;
         case 5:
-            my_planning_.goToInitialState();
+            my_planning_.addObjects();
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");
