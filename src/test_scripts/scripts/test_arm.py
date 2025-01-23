@@ -41,7 +41,7 @@ class CubeSpawner():
         bin_positions = [
             Point(x=-0.8, y=-0.25, z=0.09),  # Bin 1 (posición base)
             Point(x=-0.8, y=0.1, z=0.09),  # Bin 2 (al lado de Bin 1 en Y)
-            Point(x=1.19, y=0.17, z=0.09)  # Bin 3 (perpendicular en X)
+            Point(x=0.8, y=0.17, z=0.09)  # Bin 3 (perpendicular en X)
         ]
 
         for i, pos in enumerate(bin_positions):
@@ -65,7 +65,7 @@ class CubeSpawner():
 
         quat = tf.transformations.quaternion_from_euler(0, 0, 0)
         orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
-        pose = Pose(Point(x=2, y=-0.8, z=0.75), orient)  # Ubicación del cubo
+        pose = Pose(Point(x=2, y=-0.768, z=0.75), orient)  # Ubicación del cubo
         self.sm("cube", cube_urdf, "", pose, "world")
 
         if self.col < 2:  # Cambiar al siguiente cubo

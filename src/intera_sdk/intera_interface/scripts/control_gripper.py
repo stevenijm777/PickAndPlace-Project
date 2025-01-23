@@ -17,7 +17,7 @@ def gripper_callback(msg):
     # Ejecutar la acción solicitada
     if msg.data == 1:
         rospy.loginfo("Abriendo la pinza...")
-        right_gripper.open(0.041667)
+        right_gripper.open()
     elif msg.data == 0:
         rospy.loginfo("Cerrando la pinza...")
         right_gripper.close()

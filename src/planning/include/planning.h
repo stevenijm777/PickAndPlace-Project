@@ -39,6 +39,7 @@ namespace my_planning
             void goToCaja1();
             void goToCaja2();
             void goToCaja3();
+            void goToArticulateList(const std::vector<std::vector<double>>& joint_positions_list);
 
 
         private:
