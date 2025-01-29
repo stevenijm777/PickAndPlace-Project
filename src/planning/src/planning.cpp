@@ -1,6 +1,7 @@
 #include <planning.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/Float64.h>
 #include <ros/ros.h>
 
 namespace my_planning
@@ -8,24 +9,27 @@ namespace my_planning
     MyPlanningClass::MyPlanningClass(ros::NodeHandle& nh) : move_group(PLANNING_GROUP), nh_(nh)
     {
         // Inicializa el publicador en el constructor
-        gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+        //gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+        gripper_left_pub = nh_.advertise<std_msgs::Float64>("/robot/electric_gripper_controller/joints/right_gripper_l_finger_controller/command", 10);
+        gripper_right_pub = nh_.advertise<std_msgs::Float64>("/robot/electric_gripper_controller/joints/right_gripper_r_finger_controller/command", 10);
     }
 
     void MyPlanningClass::OpenGripper()
     {
-       // Comando para abrir el gripper (1: abrir, 0: cerrar)
-        std_msgs::Int32 msg;
-        msg.data = 1;
-        // Publica el mensaje
-        if (gripper_pub) // Asegurate de que el publicador esta inicializado
-        {
-            gripper_pub.publish(msg);
-            ROS_INFO("Mensaje enviado: %d", msg.data);
-        }
-        else
-        {
-            ROS_ERROR("El publicador no esta inicializado correctamente");
-        }
+        std_msgs::Float64 msg_left, msg_right;
+
+        // Comando para abrir: Left -> 1.0, Right -> -1.0
+        msg_left.data = 1.0;
+        msg_right.data = -1.0;
+
+        // Publicar los comandos
+        gripper_left_pub.publish(msg_left);
+        gripper_right_pub.publish(msg_right);   
+        ROS_INFO("Enviando comando para abrir gripper: Left = %f, Right = %f", msg_left.data, msg_right.data);     
+        ROS_INFO("Publicando en el tema izquierdo: %s", gripper_left_pub.getTopic().c_str());
+        ROS_INFO("Publicando en el tema derecho: %s", gripper_right_pub.getTopic().c_str());
+        ros::spinOnce();  // Permite procesar callbacks inmediatamente
+        // permitir el movimiento del gripper
         ros::Duration(1.0).sleep();
     }
 

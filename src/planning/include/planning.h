@@ -40,7 +40,8 @@ namespace my_planning
 
         private:
             const std::string PLANNING_GROUP = "right_arm";
-            ros::Publisher gripper_pub; // Publicador persistente
+            ros::Publisher gripper_left_pub; // Publicador persistente
+            ros::Publisher gripper_right_pub;
             moveit::planning_interface::MoveGroupInterface move_group;
             moveit::planning_interface::PlanningSceneInterface virtual_world;
             const robot_state::JointModelGroup* joint_model_group;
