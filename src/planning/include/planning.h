@@ -11,6 +11,7 @@ namespace my_planning
     class MyPlanningClass
     {
         public:
+            MyPlanningClass(ros::NodeHandle& nh);
             MyPlanningClass(): move_group(PLANNING_GROUP)
             {
                 target_pose1.orientation.w = 1.0;
@@ -24,16 +25,11 @@ namespace my_planning
             void goToJointState(double q1, double q2, double q3, double q4, double q5, double q6);
             void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToPoseGoal();
-            void cartesianPath();
             void resetValues();
             void addObjects();
             void goToInitialState();
             void makeBox(std::string blk_name, double *pose);
-            void removeObjects();
-            void goToPosition(double x, double y, double z);
             void goToPick();
-            void goRightPosition(double x, double y, double z);
-            void controlGripper();
             void OpenGripper();
             void CloseGripper();
             void goToCaja1();
@@ -44,11 +40,12 @@ namespace my_planning
 
         private:
             const std::string PLANNING_GROUP = "right_arm";
-
+            ros::Publisher gripper_pub; // Publicador persistente
             moveit::planning_interface::MoveGroupInterface move_group;
             moveit::planning_interface::PlanningSceneInterface virtual_world;
             const robot_state::JointModelGroup* joint_model_group;
             moveit::planning_interface::MoveGroupInterface::Plan my_plan;
             geometry_msgs::Pose target_pose1;
+            ros::NodeHandle nh_; // Guarda el NodeHandle
     };
 }

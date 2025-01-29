@@ -5,7 +5,31 @@
 
 namespace my_planning
 {
-void MyPlanningClass::goToPoseGoal()
+    MyPlanningClass::MyPlanningClass(ros::NodeHandle& nh) : move_group(PLANNING_GROUP), nh_(nh)
+    {
+        // Inicializa el publicador en el constructor
+        gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+    }
+
+    void MyPlanningClass::OpenGripper()
+    {
+       // Comando para abrir el gripper (1: abrir, 0: cerrar)
+        std_msgs::Int32 msg;
+        msg.data = 1;
+        // Publica el mensaje
+        if (gripper_pub) // Asegurate de que el publicador esta inicializado
+        {
+            gripper_pub.publish(msg);
+            ROS_INFO("Mensaje enviado: %d", msg.data);
+        }
+        else
+        {
+            ROS_ERROR("El publicador no esta inicializado correctamente");
+        }
+        ros::Duration(1.0).sleep();
+    }
+
+    void MyPlanningClass::goToPoseGoal()
     {
         move_group.setPoseTarget(target_pose1);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -164,7 +188,7 @@ void MyPlanningClass::goToCaja1(){
     std::vector<std::vector<double>> joint_positions_list = {
         {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
         {-2.943, -0.493, 0.007, 0.800, -0.191, 1.439, 0.208},
-        {-3.049, -0.255, 0.092, -0.167, -0.190, 0.275, -0.024}, // caja 1
+        {-3.049, -0.255, 0.092, -0.167, -0.190, 0.275, 0.6}, // caja 1
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
     };
 
@@ -175,8 +199,8 @@ void MyPlanningClass::goToCaja1(){
 void MyPlanningClass::goToCaja2(){
     std::vector<std::vector<double>> joint_positions_list = {
         {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
-        {-3.049, 0.382, 0.077, 0.259, 2.976, -1.059, -0.024}, // caja 2
-        {-3.050, -0.242, 0.011, 0.046, 2.976, -1.522, 0.5}, //sube 
+        {-3.049, 0.382, 0.077, 0.259, 2.976, -1.059, 0.6}, // caja 2
+        {-3.050, -0.242, 0.011, 0.046, 2.976, -1.522, 0.204}, //sube 
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
     };
 
@@ -187,7 +211,7 @@ void MyPlanningClass::goToCaja2(){
 void MyPlanningClass::goToCaja3(){
     std::vector<std::vector<double>> joint_positions_list = {
         {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
-        {0.183, -0.057, 0.077, 0.259, 2.976, -1.544, 0}, // caja 3
+        {0.183, -0.057, 0.077, 0.259, 2.976, -1.544, 0.6}, // caja 3
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
     };
 
@@ -195,32 +219,6 @@ void MyPlanningClass::goToCaja3(){
     goToArticulateList(joint_positions_list);
 }
 
-
-void MyPlanningClass::controlGripper()
-{
-    ros::NodeHandle nh;
-    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
-    // Comando para abrir el gripper (1: abrir, 0: cerrar)
-    std_msgs::Int32 msg;
-    msg.data = 1; // Cambia a 0 para cerrar el gripper
-    gripper_pub.publish(msg);
-    ros::Duration(2.0).sleep(); // 
-    msg.data = 0;
-    gripper_pub.publish(msg);
-    ros::Duration(2.0).sleep(); // 
-}
-
-void MyPlanningClass::OpenGripper()
-{
-    ros::NodeHandle nh;
-    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
-    // Comando para abrir el gripper (1: abrir, 0: cerrar)
-    std_msgs::Int32 msg;
-    msg.data = 1;
-    gripper_pub.publish(msg);
-    ROS_INFO("Mensaje enviado: %d", msg.data);
-    ros::Duration(1.0).sleep();
-}
 
 void MyPlanningClass::CloseGripper()
 {

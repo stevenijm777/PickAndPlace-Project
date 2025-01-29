@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    my_planning::MyPlanningClass my_planning_;
+    my_planning::MyPlanningClass my_planning_(node_handle);
     my_planning_.resetValues(); // Llamada fuera del switch para inicializar siempre
 
     int selection = atoi(argv[1]); // Primer argumento como número del caso
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
             my_planning_.goToPick();
             break;
         case 5:
-            my_planning_.addObjects();
+            my_planning_.OpenGripper();
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");

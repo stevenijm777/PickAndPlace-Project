@@ -39,9 +39,9 @@ class CubeSpawner():
 
         # Posiciones para formar una "L"
         bin_positions = [
-            Point(x=-0.8, y=-0.25, z=0.09),  # Bin 1 (posición base)
-            Point(x=-0.8, y=0.1, z=0.09),  # Bin 2 (al lado de Bin 1 en Y)
-            Point(x=0.8, y=0.17, z=0.09)  # Bin 3 (perpendicular en X)
+            Point(x=-0.8, y=-0.25, z=0.05),  # Bin 1 (posición base)
+            Point(x=-0.8, y=0.1, z=0.05),  # Bin 2 (al lado de Bin 1 en Y)
+            Point(x=0.8, y=0.04, z=0.05)  # Bin 3 (perpendicular en X)
         ]
 
         for i, pos in enumerate(bin_positions):
