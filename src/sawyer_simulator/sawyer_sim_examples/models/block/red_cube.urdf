@@ -24,6 +24,5 @@
   </link>
   <gazebo reference="base_link">
     <material>Gazebo/Red</material>
-    <gravity>1</gravity>  <!-- Habilita la gravedad -->
   </gazebo>
 </robot>
