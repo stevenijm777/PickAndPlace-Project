@@ -112,6 +112,9 @@ include_directories(
 add_executable(run src/run.cpp src/planning.cpp include/planning.h)
 target_link_libraries(run ${catkin_LIBRARIES})
 
+add_executable(test_gripper src/test_gripper.cpp)
+target_link_libraries(test_gripper ${catkin_LIBRARIES})
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

@@ -19,6 +19,7 @@ class CubeSpawner():
         self.cubes.append(self.path + "green_cube.urdf")
         self.cubes.append(self.path + "blue_cube.urdf")
         self.col = 0
+        self.spawned_cubes = [] # lista de nombres de cubos generados
 
         # Inicializar servicios de Gazebo
         self.sm = rospy.ServiceProxy("/gazebo/spawn_urdf_model", SpawnModel)
@@ -49,12 +50,13 @@ class CubeSpawner():
             self.sm(f"bin_{i+1}", bin_urdf, "", pose, "world")
             rospy.loginfo(f"Bin {i+1} spawned at position {pos.x}, {pos.y}, {pos.z}")
 
-    def checkModel(self):
-        res = self.ms("cube", "world")
+    def checkModel(self, name):
+        # Verifica si un modelo especifico existe un Gazebo
+        res = self.ms(name, "world")
         return res.success
 
-    def getPosition(self):
-        res = self.ms("cube", "world")
+    def getPosition(self, name):
+        res = self.ms(name, "world")
         return res.pose.position.z
 
     def spawnModel(self):
@@ -63,10 +65,21 @@ class CubeSpawner():
         with open(cube, "r") as f:
             cube_urdf = f.read()
 
+        # Crear nombre unico para cada cubo 
+        cube_name = f"cube_{len(self.spawned_cubes)+ 1}"
+
         quat = tf.transformations.quaternion_from_euler(0, 0, 0)
         orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
-        pose = Pose(Point(x=2, y=-0.768, z=0.75), orient)  # Ubicación del cubo
-        self.sm("cube", cube_urdf, "", pose, "world")
+        pose = Pose(Point(x=1.8, y=-0.768, z=0.75), orient)  # Ubicación del cubo
+
+        # Verificar si ya hay un cubo en la posicion inicial
+        for name in self.spawned_cubes:
+            if self.getPosition(name) >= 0.65:
+                #rospy.loginfo("Ya hay un cubo en la altura inicial. No se genera otra")
+                return
+        # Si no hay un cubo en la altura inicial, se genera uno nuevo
+        self.sm(cube_name, cube_urdf, "", pose, "world")
+        self.spawned_cubes.append(cube_name)
 
         if self.col < 2:  # Cambiar al siguiente cubo
             self.col += 1
@@ -97,8 +110,6 @@ if __name__ == "__main__":
 
     rospy.on_shutdown(cs.shutdown_hook)
     while not rospy.is_shutdown():
-        if cs.checkModel() == False:
-            cs.spawnModel()
-        elif cs.getPosition() < 0.05:
-            cs.deleteModel()
+        # estado incial
+        cs.spawnModel()
         r.sleep()
