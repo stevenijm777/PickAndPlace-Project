@@ -6,4 +6,9 @@
     <node name="simple_pick_and_place" pkg="test_scripts" type="test_arm.py" output="screen">
         <param name="use_sim_time" value="true"/>
     </node>
+
+    <!-- Ejecutar el script de detección de color -->
+    <node name="color_detector" pkg="test_scripts" type="detect_blocks.py" output="screen">
+        <param name="use_sim_time" value="true"/>
+    </node>
 </launch>

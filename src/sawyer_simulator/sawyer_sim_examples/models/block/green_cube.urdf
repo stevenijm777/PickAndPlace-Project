@@ -24,6 +24,5 @@
   </link>
   <gazebo reference="base_link">
     <material>Gazebo/Green</material>  <!-- Cambiado a color verde en Gazebo -->
-    <gravity>1</gravity>  <!-- Habilita la gravedad -->
   </gazebo>
 </robot>

@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 import tf
-import os
 import rospy
 import rospkg
 from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState
 from geometry_msgs.msg import Pose, Point, Quaternion
+from std_msgs.msg import Int8MultiArray
 
 class CubeSpawner():
-    def __init__(self) -> None:
+    def __init__(self):
         self.rospack = rospkg.RosPack()
-        # Ruta a los bloques
-        self.path = "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_sim_examples/models/block/"
-        # Ruta al modelo del bin
-        self.path_bin = "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_sim_examples/models/bin.urdf"
+        # Rutas de los bloques y bins
+        self.path = "/home/coflores/ros/src/PickAndPlace-Project/src/sawyer_simulator/sawyer_sim_examples/models/block/"
+        self.path_bin = "/home/coflores/ros/src/PickAndPlace-Project/src/sawyer_simulator/sawyer_sim_examples/models/bin.urdf"
+
 
         self.cubes = []
         self.cubes.append(self.path + "red_cube.urdf")
@@ -21,10 +21,18 @@ class CubeSpawner():
         self.col = 0
         self.spawned_cubes = [] # lista de nombres de cubos generados
 
+
         # Inicializar servicios de Gazebo
+        rospy.wait_for_service("/gazebo/spawn_urdf_model")
+        rospy.wait_for_service("/gazebo/delete_model")
+        rospy.wait_for_service("/gazebo/get_model_state")
+
         self.sm = rospy.ServiceProxy("/gazebo/spawn_urdf_model", SpawnModel)
         self.dm = rospy.ServiceProxy("/gazebo/delete_model", DeleteModel)
         self.ms = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
+
+        # Publicador del estado de cubos
+        self.cube_pub = rospy.Publisher("current_cube_blocks", Int8MultiArray, queue_size=10)
 
         rospy.loginfo("CubeSpawner initialized.")
 
@@ -34,23 +42,20 @@ class CubeSpawner():
         with open(self.path_bin, "r") as bin_file:
             bin_urdf = bin_file.read()
 
-        # Tamaño de los bins
-        bin_width = 0.45  # Y dimension más amplia
-        bin_height = 0.4  # X dimension
-
-        # Posiciones para formar una "L"
         bin_positions = [
+
             Point(x=-0.8, y=-0.25, z=0.05),  # Bin 1 (posición base)
             Point(x=-0.8, y=0.1, z=0.05),  # Bin 2 (al lado de Bin 1 en Y)
             Point(x=0.8, y=0.04, z=0.05)  # Bin 3 (perpendicular en X)
-        ]
-
+            ]
+        
         for i, pos in enumerate(bin_positions):
-            pose = Pose(pos, Quaternion(0, 0, 0, 1))  # Rotación en cero
+            pose = Pose(pos, Quaternion(0, 0, 0, 1))
             self.sm(f"bin_{i+1}", bin_urdf, "", pose, "world")
             rospy.loginfo(f"Bin {i+1} spawned at position {pos.x}, {pos.y}, {pos.z}")
 
     def checkModel(self, name):
+
         # Verifica si un modelo especifico existe un Gazebo
         res = self.ms(name, "world")
         return res.success
@@ -59,11 +64,16 @@ class CubeSpawner():
         res = self.ms(name, "world")
         return res.pose.position.z
 
+
     def spawnModel(self):
-        """Carga un cubo en Gazebo."""
-        cube = self.cubes[self.col]
-        with open(cube, "r") as f:
+        """Genera un cubo en Gazebo con nombre único y en secuencia de colores."""
+
+        current_color = self.cube_colors[(self.cube_counter - 1) % len(self.cube_colors)]
+        cube_path = f"{self.path}{current_color}_cube.urdf"
+
+        with open(cube_path, "r") as f:
             cube_urdf = f.read()
+
 
         # Crear nombre unico para cada cubo 
         cube_name = f"cube_{len(self.spawned_cubes)+ 1}"
@@ -80,35 +90,36 @@ class CubeSpawner():
         # Si no hay un cubo en la altura inicial, se genera uno nuevo
         self.sm(cube_name, cube_urdf, "", pose, "world")
         self.spawned_cubes.append(cube_name)
+            rospy.loginfo(f"Spawning {cube_name}...")
+            self.sm(cube_name, cube_urdf, "", pose, "world")
+            rospy.loginfo(f"{cube_name} spawned successfully.")
 
-        if self.col < 2:  # Cambiar al siguiente cubo
-            self.col += 1
+            self.publish_cube_list(self.cube_counter % len(self.cube_colors))
+            self.cube_counter += 1
         else:
-            self.col = 0
-        rospy.sleep(1)
+            rospy.logwarn(f"{cube_name} already exists, skipping...")
 
-    def deleteModel(self):
-        """Elimina el cubo actual de Gazebo."""
-        self.dm("cube")
-        rospy.sleep(1)
+        rospy.sleep(15)
 
     def shutdown_hook(self):
-        """Limpia modelos al apagar."""
-        self.deleteModel()
         rospy.loginfo("Shutting down and cleaning up.")
+        for i in range(1, self.cube_counter):
+            for color in self.cube_colors:
+                cube_name = f"cube_{color}_{i}"
+                try:
+                    self.dm(cube_name)
+                    rospy.loginfo(f"Deleted {cube_name}")
+                except rospy.ServiceException:
+                    rospy.logwarn(f"Could not delete {cube_name}, it may not exist.")
 
 if __name__ == "__main__":
-    print("Waiting for Gazebo services...")
     rospy.init_node("spawn_objects")
-    rospy.wait_for_service("/gazebo/delete_model")
-    rospy.wait_for_service("/gazebo/spawn_urdf_model")
-    rospy.wait_for_service("/gazebo/get_model_state")
-    
-    r = rospy.Rate(15)
     cs = CubeSpawner()
-    cs.spawn_bin()  # Cargar los bins en forma de L
+    cs.spawn_bin()
 
     rospy.on_shutdown(cs.shutdown_hook)
+
+    rate = rospy.Rate(0.1)
     while not rospy.is_shutdown():
         # estado incial
         cs.spawnModel()
