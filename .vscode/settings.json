@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_gazebo",
+    "cmake.sourceDirectory": "/home/steven/catkin_ws/src/PickAndPlace-Project/src/planning",
     "files.associations": {
         "*.sqlbook": "sql",
         "*.ndjson": "jsonl",

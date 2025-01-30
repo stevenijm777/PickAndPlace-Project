@@ -9,10 +9,12 @@ from geometry_msgs.msg import Pose, Point, Quaternion
 class CubeSpawner():
     def __init__(self) -> None:
         self.rospack = rospkg.RosPack()
+        # Mi directiorio
+        miRuta = "/home/steven/catkin_ws/src/PickAndPlace-Project"
         # Ruta a los bloques
-        self.path = "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_sim_examples/models/block/"
+        self.path = miRuta+ "/src/sawyer_simulator/sawyer_sim_examples/models/block/"
         # Ruta al modelo del bin
-        self.path_bin = "/home/stemjara/ros_ws/src/sawyer_simulator/sawyer_sim_examples/models/bin.urdf"
+        self.path_bin = miRuta+"/src/sawyer_simulator/sawyer_sim_examples/models/bin.urdf"
 
         self.cubes = []
         self.cubes.append(self.path + "red_cube.urdf")
