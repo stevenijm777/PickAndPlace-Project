@@ -38,9 +38,9 @@ def image_callback(msg):
     hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
     # Definir rangos de color para detección
-    lower_red = np.array([0, 120, 70])
-    upper_red = np.array([10, 255, 255])
-    mask_red = cv2.inRange(hsv, lower_red, upper_red)
+    lower_yellow = np.array([20, 100, 100])  # Amarillo en HSV
+    upper_yellow = np.array([30, 255, 255])
+    mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
     lower_green = np.array([35, 100, 100])
     upper_green = np.array([85, 255, 255])
@@ -50,14 +50,14 @@ def image_callback(msg):
     upper_blue = np.array([130, 255, 255])
     mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
 
-    # Detectar contornos de bloques rojos
-    contours_red, _ = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in contours_red:
+    # Detectar contornos de bloques amarillos
+    contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours_yellow:
         if cv2.contourArea(contour) > 500:  # Filtrar ruido
             x, y, w, h = cv2.boundingRect(contour)
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
-            cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 0, 255), 2)
-            rospy.loginfo(f"Bloque ROJO en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
+            cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 255), 2)  # Amarillo (BGR: 0,255,255)
+            rospy.loginfo(f"Bloque AMARILLO en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
 
     # Detectar contornos de bloques verdes
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -79,7 +79,7 @@ def image_callback(msg):
 
     # Mostrar la imagen procesada
     cv2.imshow("Camera View", cv_image)
-    cv2.imshow("Red Mask", mask_red)
+    cv2.imshow("Yellow Mask", mask_yellow)
     cv2.imshow("Green Mask", mask_green)
     cv2.imshow("Blue Mask", mask_blue)
     cv2.waitKey(1)
