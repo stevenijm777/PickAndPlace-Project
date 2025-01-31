@@ -12,7 +12,7 @@
         <box size="0.075 0.04 0.05"/>  <!-- Aumentamos la longitud en X para que se vea acostado -->
       </geometry>
       <material name="red">
-        <color rgba="1 0 0 1"/>
+        <color rgba="1 1 0 1"/>
       </material>
     </visual>
     <collision>
