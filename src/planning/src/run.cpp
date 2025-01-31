@@ -28,7 +28,7 @@ int main(int argc, char **argv)
             my_planning_.goToCaja1();
             break;
         case 2:
-            my_planning_.goToCaja2();
+            my_planning_.goToCaja3();
             break;
         case 3:
             my_planning_.CloseGripper();

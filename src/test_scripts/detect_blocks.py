@@ -50,6 +50,10 @@ def image_callback(msg):
     upper_blue = np.array([130, 255, 255])
     mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
 
+    cmd_yellow = "rosrun planning run 1"
+    cmd_blue = "rosrun planning run 2"
+    cmd_green = "rosrun planning run 3"
+
     # Detectar contornos de bloques amarillos
     contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours_yellow:
@@ -58,7 +62,7 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 255), 2)  # Amarillo (BGR: 0,255,255)
             rospy.loginfo(f"Bloque AMARILLO en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
-            if X_gazebo==265:
+            if x>=250 and x<300:
                 rospy.loginfo("El bloque esta listo para recoger")
 
     # Detectar contornos de bloques verdes
@@ -69,7 +73,7 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 0), 2)
             rospy.loginfo(f"Bloque VERDE en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
-            if X_gazebo==265:
+            if x>=250 and x<300:
                 rospy.loginfo("El bloque esta listo para recoger")
     # Detectar contornos de bloques azules
     contours_blue, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -79,8 +83,9 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (255, 0, 0), 2)
             rospy.loginfo(f"Bloque AZUL en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
-            if X_gazebo==265:
+            if x>=250 and x<300:
                 rospy.loginfo("El bloque esta listo para recoger")
+
     # Mostrar la imagen procesada
     cv2.imshow("Camera View", cv_image)
     cv2.imshow("Yellow Mask", mask_yellow)
