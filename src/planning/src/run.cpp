@@ -38,7 +38,6 @@ int main(int argc, char **argv)
             break;
         case 5:
             my_planning_.OpenGripper();
-            ros::Duration(5.0).sleep(); // Espera suficiente tiempo
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");

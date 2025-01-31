@@ -37,7 +37,7 @@ namespace my_planning
         //pub para abrir el right
         system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_r_finger_controller/command std_msgs/Float64 \"data: -1.0\"");
 
-        ros::Duration(1.0).sleep();
+        ros::Duration(0.5).sleep();
     }
 
     void MyPlanningClass::CloseGripper()
@@ -53,7 +53,7 @@ namespace my_planning
         system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_l_finger_controller/command std_msgs/Float64 \"data: 0.0\"");
         //pub para abrir el right
         system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_r_finger_controller/command std_msgs/Float64 \"data: 0.0\"");
-        ros::Duration(1.0).sleep();
+        ros::Duration(0.5).sleep();
     }
 
 
@@ -85,7 +85,7 @@ namespace my_planning
         move_group.move(); // blocking
     }
 
-    void MyPlanningClass::goToJointState(double q1, double q2, double q3, double q4, double q5, double q6)
+    void MyPlanningClass::goToJointState(double q1, double q2, double q3, double q4, double q5, double q6, double q7)
     {
         robot_state::RobotState current_state = *move_group.getCurrentState();
         std::vector<double> joint_positions;
@@ -98,6 +98,7 @@ namespace my_planning
         joint_positions[3] = q4;
         joint_positions[4] = q5;
         joint_positions[5] = q6;
+        joint_positions[6] = q7;
 
         move_group.setJointValueTarget(joint_positions);
         bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -191,12 +192,16 @@ void MyPlanningClass::goToArticulateList(const std::vector<std::vector<double>>&
             target_joint_positions[2],
             target_joint_positions[3],
             target_joint_positions[4],
-            target_joint_positions[5]
+            target_joint_positions[5],
+            target_joint_positions[6]
         );
         // Ajustar el tiempo de espera en función de la posición
-        if (target_joint_positions[5] >= 0.5) {
-            ros::Duration(2).sleep();
+        if (target_joint_positions[6] >= 0.5) {            
+            ros::Duration(1).sleep();
+            OpenGripper();
+            ros::Duration(1).sleep();
         } else {
+            CloseGripper();
             ros::Duration(0.5).sleep();
         }
     }
@@ -215,11 +220,14 @@ void MyPlanningClass::goToPick()
 
 void MyPlanningClass::goToCaja1(){
     std::vector<std::vector<double>> joint_positions_list = {
-        {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
+        {-1.662, -0.430, 0.190, 0.800, -0.266, 1.137, 0.202}, //sube primero
+        {-2.356, -0.430, 0.190, 0.800, -0.266, 1.137, 0.202}, // a un lado 
+        {-2.620, -0.430, 0.190, 0.800, -0.266, 1.137, 0.202},
         {-2.943, -0.493, 0.007, 0.800, -0.191, 1.439, 0.208},
         {-3.049, -0.255, 0.092, -0.167, -0.190, 0.275, 0.6}, // caja 1
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
     };
+    
 
     // Llamada a la función genérica
     goToArticulateList(joint_positions_list);
@@ -227,7 +235,7 @@ void MyPlanningClass::goToCaja1(){
 
 void MyPlanningClass::goToCaja2(){
     std::vector<std::vector<double>> joint_positions_list = {
-        {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
+        {-1.662, -0.430, 0.190, 0.800, -0.266, 1.137, 0.202}, //sube primero
         {-3.049, 0.382, 0.077, 0.259, 2.976, -1.059, 0.6}, // caja 2
         {-3.050, -0.242, 0.011, 0.046, 2.976, -1.522, 0.204}, //sube 
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
@@ -239,7 +247,7 @@ void MyPlanningClass::goToCaja2(){
 
 void MyPlanningClass::goToCaja3(){
     std::vector<std::vector<double>> joint_positions_list = {
-        {-1.653, -0.754, 0.248, 0.893, -0.266, 0.836, 0,202}, //sube primero
+        {-1.662, -0.430, 0.190, 0.800, -0.266, 1.137, 0.202}, //sube primero
         {0.183, -0.057, 0.077, 0.259, 2.976, -1.544, 0.6}, // caja 3
         {-1.644, -0.385, 0.247, 0.861, -0.260, 0.847, 0.202}, // ready to pick
     };

@@ -58,6 +58,8 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 255), 2)  # Amarillo (BGR: 0,255,255)
             rospy.loginfo(f"Bloque AMARILLO en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
+            if X_gazebo==265:
+                rospy.loginfo("El bloque esta listo para recoger")
 
     # Detectar contornos de bloques verdes
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -67,7 +69,8 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 0), 2)
             rospy.loginfo(f"Bloque VERDE en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
-
+            if X_gazebo==265:
+                rospy.loginfo("El bloque esta listo para recoger")
     # Detectar contornos de bloques azules
     contours_blue, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours_blue:
@@ -76,7 +79,8 @@ def image_callback(msg):
             X_gazebo, Y_gazebo, Z_gazebo = pixel_to_world(x + w//2, y + h//2)
             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (255, 0, 0), 2)
             rospy.loginfo(f"Bloque AZUL en la imagen (x: {x}, y: {y}) → Gazebo (X: {X_gazebo:.2f}, Y: {Y_gazebo:.2f}, Z: {Z_gazebo})")
-
+            if X_gazebo==265:
+                rospy.loginfo("El bloque esta listo para recoger")
     # Mostrar la imagen procesada
     cv2.imshow("Camera View", cv_image)
     cv2.imshow("Yellow Mask", mask_yellow)

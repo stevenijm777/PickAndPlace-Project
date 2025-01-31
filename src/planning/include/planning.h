@@ -22,7 +22,7 @@ namespace my_planning
                 move_group.allowReplanning(true);
                 move_group.setNumPlanningAttempts(10);
             }
-            void goToJointState(double q1, double q2, double q3, double q4, double q5, double q6);
+            void goToJointState(double q1, double q2, double q3, double q4, double q5, double q6, double q7);
             void goToPoseGoal(geometry_msgs::Pose &pose);
             void goToPoseGoal();
             void resetValues();
