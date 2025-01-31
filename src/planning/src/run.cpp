@@ -31,7 +31,7 @@ int main(int argc, char **argv)
             my_planning_.goToCaja2();
             break;
         case 3:
-            my_planning_.goToCaja3();
+            my_planning_.CloseGripper();
             break;
         case 4:
             my_planning_.goToPick();

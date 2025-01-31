@@ -3,7 +3,7 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float64.h>
 #include <ros/ros.h>
-
+#include <cstdlib>
 namespace my_planning
 {
     MyPlanningClass::MyPlanningClass(ros::NodeHandle& nh) : move_group(PLANNING_GROUP), nh_(nh)
@@ -16,22 +16,47 @@ namespace my_planning
 
     void MyPlanningClass::OpenGripper()
     {
-        std_msgs::Float64 msg_left, msg_right;
+        //std_msgs::Float64 msg_left, msg_right;
 
         // Comando para abrir: Left -> 1.0, Right -> -1.0
-        msg_left.data = 1.0;
-        msg_right.data = -1.0;
+        //msg_left.data = 1.0;
+        //msg_right.data = -1.0;
 
         // Publicar los comandos
-        gripper_left_pub.publish(msg_left);
-        gripper_right_pub.publish(msg_right);   
-        ROS_INFO("Enviando comando para abrir gripper: Left = %f, Right = %f", msg_left.data, msg_right.data);     
-        ROS_INFO("Publicando en el tema izquierdo: %s", gripper_left_pub.getTopic().c_str());
-        ROS_INFO("Publicando en el tema derecho: %s", gripper_right_pub.getTopic().c_str());
-        ros::spinOnce();  // Permite procesar callbacks inmediatamente
-        // permitir el movimiento del gripper
+        //gripper_left_pub.publish(msg_left);
+        //gripper_right_pub.publish(msg_right);   
+        //ROS_INFO("Enviando comando para abrir gripper: Left = %f, Right = %f", msg_left.data, msg_right.data);     
+        //ROS_INFO("Publicando en el tema izquierdo: %s", gripper_left_pub.getTopic().c_str());
+        //ROS_INFO("Publicando en el tema derecho: %s", gripper_right_pub.getTopic().c_str());
+        //ros::spinOnce();  // Permite procesar callbacks inmediatamente
+        // permitir el movimiento del gripper usando controlGripper
+        //system("rostopic pub -1 /gripper_control std_msgs/Int32 \"data: 1\"");
+        // usando electric_gripper para mayor rango de apertura
+        //pub para abrir el left 
+        system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_l_finger_controller/command std_msgs/Float64 \"data: 1.0\"");
+        //pub para abrir el right
+        system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_r_finger_controller/command std_msgs/Float64 \"data: -1.0\"");
+
         ros::Duration(1.0).sleep();
     }
+
+    void MyPlanningClass::CloseGripper()
+    {
+        //ros::NodeHandle nh;
+        //ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
+        //// Comando para abrir el gripper (1: abrir, 0: cerrar)
+        //std_msgs::Int32 msg;
+        //msg.data = 0;
+        //gripper_pub.publish(msg);
+        //ROS_INFO("Mensaje enviado: %d", msg.data);
+        //pub para abrir el left 
+        system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_l_finger_controller/command std_msgs/Float64 \"data: 0.0\"");
+        //pub para abrir el right
+        system("rostopic pub -1 /robot/electric_gripper_controller/joints/right_gripper_r_finger_controller/command std_msgs/Float64 \"data: 0.0\"");
+        ros::Duration(1.0).sleep();
+    }
+
+
 
     void MyPlanningClass::goToPoseGoal()
     {
@@ -221,19 +246,6 @@ void MyPlanningClass::goToCaja3(){
 
     // Llamada a la función genérica
     goToArticulateList(joint_positions_list);
-}
-
-
-void MyPlanningClass::CloseGripper()
-{
-    ros::NodeHandle nh;
-    ros::Publisher gripper_pub = nh.advertise<std_msgs::Int32>("/gripper_control", 10);
-    // Comando para abrir el gripper (1: abrir, 0: cerrar)
-    std_msgs::Int32 msg;
-    msg.data = 0;
-    gripper_pub.publish(msg);
-    ROS_INFO("Mensaje enviado: %d", msg.data);
-    ros::Duration(1.0).sleep();
 }
 
 }

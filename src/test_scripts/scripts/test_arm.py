@@ -11,7 +11,7 @@ class CubeSpawner():
     def __init__(self) -> None:
         self.rospack = rospkg.RosPack()
         # Mi directiorio
-        miRuta = "/home/steven/catkin_ws/src/PickAndPlace-Project"
+        miRuta = "/home/steven/PickAndPlace-Project"
         # Ruta a los bloques
         self.path = miRuta+ "/src/sawyer_simulator/sawyer_sim_examples/models/block/"
         # Ruta al modelo del bin
