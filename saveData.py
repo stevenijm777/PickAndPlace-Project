@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sensor_msgs.msg import JointState
 
 # Ruta al archivo .bag
-bag_file = "2025-01-19-22-48-18.bag"
+bag_file = "2025-01-31-21-37-58.bag"
 
 # Almacenar datos
 time = []

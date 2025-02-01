@@ -51,3 +51,5 @@ target_link_libraries(run ${catkin_LIBRARIES})
 add_executable(banda src/banda.cpp)
 target_link_libraries(banda ${catkin_LIBRARIES})
 
+add_executable(pick src/pick.cpp src/planning.cpp)
+target_link_libraries(pick ${catkin_LIBRARIES})
