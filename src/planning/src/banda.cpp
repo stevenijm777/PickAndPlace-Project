@@ -3,12 +3,10 @@
 
 class MyPlanningClass {
 public:
-    void startConveyor() {
-        system("rosservice call /conveyor/control \"{power: 10}\"");
-    }
-
-    void stopConveyor() {
-        system("rosservice call /conveyor/control \"{power: 0}\"");
+    void setConveyorPower(int power) {
+        std::string command = "rosservice call /conveyor/control \"{power: " + std::to_string(power) + "}\"";
+        system(command.c_str());
+        ROS_INFO("Conveyor power set to: %d", power);
     }
 };
 
@@ -19,10 +17,14 @@ int main(int argc, char** argv) {
     MyPlanningClass conveyor;
     
     while (ros::ok()) {
-        conveyor.startConveyor();
-        ros::Duration(79).sleep(); // Espera 1 min 19 seg
-        conveyor.stopConveyor();
-        ros::Duration(3).sleep(); // Detiene por 3 segundos
+        conveyor.setConveyorPower(5);
+        ros::Duration(96).sleep(); // 1 min 36 seg
+
+        conveyor.setConveyorPower(1);
+        ros::Duration(8).sleep(); // 8 seg
+
+        conveyor.setConveyorPower(0);
+        ros::Duration(60).sleep(); // 1 min
     }
 
     return 0;

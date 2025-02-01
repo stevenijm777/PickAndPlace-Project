@@ -73,7 +73,7 @@ class CubeSpawner():
 
         quat = tf.transformations.quaternion_from_euler(0, 0, 0)
         orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
-        pose = Pose(Point(x=1.2, y=-0.780, z=0.75), orient)  # Ubicación del cubo
+        pose = Pose(Point(x=1.2, y=-0.775, z=0.75), orient)  # Ubicación del cubo
 
         # Verificar si ya hay un cubo en la posicion inicial
         for name in self.spawned_cubes:

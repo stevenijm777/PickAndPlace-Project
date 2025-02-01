@@ -37,7 +37,7 @@ int main(int argc, char **argv)
             my_planning_.goToPick();
             break;
         case 5:
-            my_planning_.OpenGripper();
+            my_planning_.goToCaja2();
             break;
         default:
             ROS_WARN("Invalid option. Please select a valid number between 1 and 6.");
